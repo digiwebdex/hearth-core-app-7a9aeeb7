@@ -62,4 +62,4 @@ app.use("/api/cron", require("./routes/cron"));
 // Health check
 app.get("/api/health", (_, res) => res.json({ status: "ok", time: new Date().toISOString() }));
 
-app.listen(PORT, () => console.log(`✅ Skyline API running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ TAWSS API running on port ${PORT}`));

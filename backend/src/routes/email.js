@@ -12,7 +12,7 @@ router.get("/config", async (req, res) => {
     secure: process.env.SMTP_SECURE === "true",
     user: process.env.SMTP_USER || "",
     pass: "", // never return password
-    fromName: process.env.SMTP_FROM_NAME || "Skyline Travel",
+    fromName: process.env.SMTP_FROM_NAME || "Travel Agency Web",
     fromEmail: process.env.SMTP_FROM || "noreply@travelagencyweb.com",
   });
 });

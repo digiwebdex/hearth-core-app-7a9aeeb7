@@ -186,7 +186,7 @@ async function sendInvoiceEmail(invoice, clientEmail) {
           <p><strong>Due Date:</strong> ${invoice.dueDate || "N/A"}</p>
         </div>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
   });
