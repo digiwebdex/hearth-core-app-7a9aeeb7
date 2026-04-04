@@ -125,7 +125,7 @@ async function sendContactConfirmation(data) {
         <p>We've received your message and will respond within 24 hours.</p>
         <p style="color:#666;"><strong>Subject:</strong> ${data.subject || "General inquiry"}</p>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
   });
