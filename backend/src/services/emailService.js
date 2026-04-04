@@ -70,7 +70,7 @@ async function sendPasswordReset(email, resetToken) {
         </p>
         <p style="color:#666;font-size:14px;">This link expires in 1 hour. If you didn't request this, ignore this email.</p>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
     text: `Reset your password: ${resetUrl} (expires in 1 hour)`,
