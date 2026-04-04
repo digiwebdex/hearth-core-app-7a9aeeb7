@@ -26,7 +26,14 @@ sudo systemctl start postgresql
 echo "═══ Step 2: Setting up database ═══"
 DB_PASSWORD=$(openssl rand -hex 16)
 
-sudo -u postgres psql -c "CREATE USER hearth WITH PASSWORD '$DB_PASSWORD';" 2>/dev/null || echo "User already exists"
+# Create user or update password if user already exists
+if sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='hearth'" | grep -q 1; then
+  echo "User already exists — updating password"
+  sudo -u postgres psql -c "ALTER USER hearth WITH PASSWORD '$DB_PASSWORD';"
+else
+  sudo -u postgres psql -c "CREATE USER hearth WITH PASSWORD '$DB_PASSWORD';"
+fi
+
 sudo -u postgres psql -c "CREATE DATABASE hearth_db OWNER hearth;" 2>/dev/null || echo "Database already exists"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE hearth_db TO hearth;"
 
