@@ -1,16 +1,16 @@
 #!/bin/bash
 # ══════════════════════════════════════════════════════════════
-# First-time VPS Setup for Skyline Travel SaaS
-# Run ONCE as root on your VPS (187.77.144.38)
+# First-time VPS Setup for Hearth Core App
+# Run ONCE as root on your VPS
 # After this, all future deploys happen via GitHub Actions
 # ══════════════════════════════════════════════════════════════
 set -e
 
 echo "══════════════════════════════════════════════"
-echo "  Skyline Travel SaaS — First-Time VPS Setup"
+echo "  Hearth Core App — First-Time VPS Setup"
 echo "══════════════════════════════════════════════"
 
-FRONTEND_DIR="/var/www/skyline-frontend"
+FRONTEND_DIR="/var/www/hearth-core-app"
 BACKEND_DIR="$FRONTEND_DIR/backend"
 
 # ── 1. Install PostgreSQL ──
@@ -26,9 +26,9 @@ sudo systemctl start postgresql
 echo "═══ Step 2: Setting up database ═══"
 DB_PASSWORD=$(openssl rand -hex 16)
 
-sudo -u postgres psql -c "CREATE USER skyline WITH PASSWORD '$DB_PASSWORD';" 2>/dev/null || echo "User already exists"
-sudo -u postgres psql -c "CREATE DATABASE skyline_db OWNER skyline;" 2>/dev/null || echo "Database already exists"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE skyline_db TO skyline;"
+sudo -u postgres psql -c "CREATE USER hearth WITH PASSWORD '$DB_PASSWORD';" 2>/dev/null || echo "User already exists"
+sudo -u postgres psql -c "CREATE DATABASE hearth_db OWNER hearth;" 2>/dev/null || echo "Database already exists"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE hearth_db TO hearth;"
 
 # ── 3. Install Node.js 20 ──
 echo "═══ Step 3: Installing Node.js ═══"
@@ -47,7 +47,7 @@ echo "═══ Step 5: Setting up project ═══"
 if [ ! -d "$FRONTEND_DIR/.git" ]; then
   echo "ERROR: Git repo not found at $FRONTEND_DIR"
   echo "Please clone your GitHub repo first:"
-  echo "  git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git $FRONTEND_DIR"
+  echo "  git clone https://github.com/digiwebdex/hearth-core-app.git $FRONTEND_DIR"
   echo "Then run this script again."
   exit 1
 fi
@@ -60,7 +60,7 @@ echo "═══ Step 6: Configuring backend ═══"
 JWT_SECRET=$(openssl rand -hex 32)
 
 cat > "$BACKEND_DIR/.env" << ENVFILE
-DATABASE_URL="postgresql://skyline:${DB_PASSWORD}@localhost:5432/skyline_db"
+DATABASE_URL="postgresql://hearth:${DB_PASSWORD}@localhost:5432/hearth_db"
 JWT_SECRET="${JWT_SECRET}"
 PORT=4000
 CORS_ORIGIN="https://travelagencyweb.com"
@@ -76,8 +76,8 @@ npx prisma db push
 node prisma/seed.js
 
 # Start with PM2
-pm2 delete skyline-api 2>/dev/null || true
-pm2 start src/index.js --name "skyline-api"
+pm2 delete hearth-core-api 2>/dev/null || true
+pm2 start src/index.js --name "hearth-core-api"
 pm2 save
 pm2 startup
 
@@ -95,8 +95,8 @@ npm run build
 
 # ── 8. Nginx ──
 echo "═══ Step 8: Configuring Nginx ═══"
-sudo cp "$FRONTEND_DIR/nginx.conf" /etc/nginx/sites-available/skyline
-sudo ln -sf /etc/nginx/sites-available/skyline /etc/nginx/sites-enabled/
+sudo cp "$FRONTEND_DIR/nginx.conf" /etc/nginx/sites-available/hearth-core
+sudo ln -sf /etc/nginx/sites-available/hearth-core /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl reload nginx
 
