@@ -1,57 +1,91 @@
 
-## Phase 1: Verify Deployment Safety
-Read and audit: emailService.js, cron.js, auth.js, invoices.js, accounts.js, contact.js, demo.js — confirm all production-safe.
+# Full Branding Update Plan
 
-## Phase 2: Payment Gateway Backend
-1. **SSLCommerz route** (`backend/src/routes/sslcommerz.js`):
-   - POST /initiate — creates session with SSLCommerz API, returns redirect URL
-   - POST /success, /fail, /cancel — IPN callbacks
-   - POST /ipn — server-to-server validation
-   - Links payment to invoice or payment-request
-   - Updates invoice/booking/subscription status
-   - Audit logs all events
+## Brand Mapping
+| Old | New |
+|---|---|
+| Globex Connect | Travel Agency Website & Software Solution |
+| GLOBEX CONNECT | TRAVEL AGENCY WEB |
+| GLOBEX | TAWSS |
+| Skyline Travel | Travel Agency Website & Software Solution |
+| Skyline | TAWSS |
+| globexconnect.com | travelagencyweb.com |
+| support@globexconnect.com | support@travelagencyweb.com |
+| noreply@globexconnect.com | noreply@travelagencyweb.com |
+| noreply@travelagencyweb.com | noreply@travelagencyweb.com (keep) |
+| info@skylinetravel.com | info@travelagencyweb.com |
+| DigiWebDex | Travel Agency Website & Software Solution |
+| skyline-backend | tawss-backend |
+| Skyline API | TAWSS API |
+| Tagline | Complete Travel Agency Website & Software Solution |
 
-2. **bKash route** (`backend/src/routes/bkash.js`):
-   - POST /create — creates bKash payment
-   - POST /execute — executes after user approval
-   - POST /callback — webhook handler
-   - Same linkage and audit logging
+## Logo Asset
+- Copy uploaded `Logo.png` → `src/assets/logo.png` + `public/images/logo.png`
+- Generate favicon from logo
+- Replace Globe icon usage with actual logo image in nav/headers
 
-3. **Payment gateway service** (`backend/src/services/paymentGateway.js`):
-   - Abstraction layer for SSLCommerz + bKash
-   - Shared validation, status mapping, invoice/subscription update logic
+## Files to Update (27 files)
 
-4. Mount routes in index.js, update frontend PaymentGatewayDialog to use real endpoints
+### 1. HTML & SEO (1 file)
+- `index.html` — title, meta, OG tags, Twitter cards, JSON-LD, canonical URL, favicon
 
-## Phase 3: Communication Abstraction
-1. **SMS service** (`backend/src/services/smsService.js`):
-   - Provider abstraction (Twilio, local BD providers)
-   - sendSms(to, message) with console fallback
-   - Templates for booking confirmation, payment received, password reset OTP
+### 2. Marketing Pages (7 files)
+- `src/pages/Index.tsx` — hero, testimonials, FAQ, CTA, dialog, meta
+- `src/pages/marketing/Terms.tsx` — all Globex/DigiWebDex refs
+- `src/pages/marketing/Privacy.tsx` — all Globex/DigiWebDex refs
+- `src/pages/marketing/ContactUs.tsx` — email
+- `src/pages/marketing/Demo.tsx` — if brand mentioned
+- `src/pages/marketing/FAQ.tsx` — if brand mentioned
+- `src/pages/marketing/Features.tsx` — if brand mentioned
+- `src/pages/marketing/Pricing.tsx` — if brand mentioned
 
-2. **WhatsApp service** (`backend/src/services/whatsappService.js`):
-   - Provider abstraction (Twilio WhatsApp, WhatsApp Business API)
-   - sendWhatsApp(to, template, params) with console fallback
+### 3. Layouts (2 files)
+- `src/components/MarketingLayout.tsx` — nav brand, footer, canonical URL, contact email
+- `src/components/PublicLayout.tsx` — if brand hardcoded
 
-3. **Notification engine** (`backend/src/services/notificationService.js`):
-   - Event-based: booking_confirmed, payment_received, subscription_activated, password_reset
-   - Dispatches to email + SMS + WhatsApp based on config
-   - Non-blocking, error-tolerant
+### 4. Admin & App (4 files)
+- `src/pages/admin/AdminSettings.tsx` — default emails, domain, brand
+- `src/pages/admin/AdminDomains.tsx` — nginx template path
+- `src/components/AdminSidebar.tsx` — brand name
+- `src/components/AppSidebar.tsx` — brand name
 
-## Files to create/modify
-- backend/src/services/paymentGateway.js (new)
-- backend/src/routes/sslcommerz.js (new)
-- backend/src/routes/bkash.js (new)
-- backend/src/services/smsService.js (new)
-- backend/src/services/whatsappService.js (new)
-- backend/src/services/notificationService.js (new)
-- backend/src/index.js (mount new routes)
-- src/lib/paymentGatewayApi.ts (update to real endpoints)
-- backend/.env.example (add all new env vars)
+### 5. SEO Files (2 files)
+- `public/sitemap.xml` — all domain refs
+- `public/robots.txt` — sitemap URL
 
-## Env vars needed
-- SSLCOMMERZ_STORE_ID, SSLCOMMERZ_STORE_PASSWORD, SSLCOMMERZ_SANDBOX (payment)
-- BKASH_APP_KEY, BKASH_APP_SECRET, BKASH_USERNAME, BKASH_PASSWORD, BKASH_SANDBOX (payment)
-- PAYMENT_SUCCESS_URL, PAYMENT_FAIL_URL, PAYMENT_CANCEL_URL, PAYMENT_IPN_URL (callbacks)
-- SMS_PROVIDER, SMS_API_KEY, SMS_SENDER_ID (SMS)
-- WHATSAPP_PROVIDER, WHATSAPP_API_KEY, WHATSAPP_FROM_NUMBER (WhatsApp)
+### 6. Backend (7 files)
+- `backend/src/services/emailService.js` — all Skyline refs, from email
+- `backend/src/services/smsService.js` — Skyline refs
+- `backend/src/index.js` — console log brand
+- `backend/package.json` — name
+- `backend/.env.example` — from email, from name
+- `backend/prisma/seed.js` — admin tenant name, demo email
+- `backend/src/routes/email.js` — default from name
+
+### 7. Frontend Lib/Context (3 files)
+- `src/contexts/WebsiteContext.tsx` — demo tenant data
+- `src/lib/auditLog.ts` — seed email
+- `src/lib/notificationEngine.ts` — system email
+
+### 8. Other (2 files)
+- `src/pages/site/SitePricing.tsx` — GLOBEX brand
+- `.env.example` — domain comments
+- `src/components/SmtpSettings.tsx` — placeholder email
+- `src/pages/QuotationPrint.tsx` — agency name placeholder
+
+### 9. Logo integration
+- `src/components/MarketingLayout.tsx` — replace Globe icon with logo image
+- `src/components/AdminSidebar.tsx` — add logo
+- `src/components/AppSidebar.tsx` — add logo
+
+## NOT Changed (preserve)
+- Business logic, routes, API paths
+- Payment gateway callbacks (use FRONTEND_URL env var already)
+- Database schema
+- Component structure
+
+## Env vars user must update on VPS
+- `SMTP_FROM_NAME=Travel Agency Website & Software Solution`
+- `SMTP_FROM=noreply@travelagencyweb.com`
+- `FRONTEND_URL=https://travelagencyweb.com`
+- `ADMIN_NOTIFICATION_EMAIL=support@travelagencyweb.com`
