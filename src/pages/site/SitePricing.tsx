@@ -181,7 +181,7 @@ const SitePricing = () => {
 
       {/* Footer */}
       <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} GLOBEX. All rights reserved.
+        © {new Date().getFullYear()} TAWSS. All rights reserved.
       </footer>
     </div>
   );

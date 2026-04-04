@@ -108,11 +108,11 @@ const defaultPayment: PaymentSettings = {
 };
 
 const defaultDomain: DomainSettings = {
-  mainDomain: "travelsaas.digiwebdex.com",
+  mainDomain: "travelagencyweb.com",
   subdomainPrefix: "app",
   sslEnabled: true,
   customDomainEnabled: true,
-  defaultSubdomain: "{company}.travelsaas.digiwebdex.com",
+  defaultSubdomain: "{company}.travelagencyweb.com",
 };
 
 const defaultSms: SmsSettings = {
