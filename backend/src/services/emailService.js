@@ -58,7 +58,7 @@ async function sendPasswordReset(email, resetToken) {
   const resetUrl = `${getFrontendUrl()}/reset-password?token=${resetToken}`;
   return sendEmail({
     to: email,
-    subject: "Password Reset - Skyline Travel",
+    subject: "Password Reset - Travel Agency Web",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
         <h2 style="color:#0f172a;">Password Reset Request</h2>
