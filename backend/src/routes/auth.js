@@ -118,9 +118,7 @@ router.post("/forgot-password", async (req, res) => {
       data: { resetToken, resetTokenExpiry },
     });
 
-    // If SMTP is configured, send email. Otherwise log to console.
-    const resetUrl = `${process.env.FRONTEND_URL || "https://travelagencyweb.com"}/reset-password?token=${resetToken}`;
-
+    // Send password reset email (SMTP or console fallback)
     const { sendPasswordReset } = require("../services/emailService");
     await sendPasswordReset(email, resetToken);
 
