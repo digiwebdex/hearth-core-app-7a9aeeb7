@@ -158,7 +158,7 @@ const Features = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-3">The Travel Agency Workflow</h2>
-            <p className="text-white/50">How Globex Connect takes you from inquiry to trip completion</p>
+            <p className="text-white/50">How our platform takes you from inquiry to trip completion</p>
           </div>
           <div className="flex flex-wrap justify-center gap-4 md:gap-2 max-w-5xl mx-auto">
             {[
