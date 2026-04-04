@@ -1,34 +1,78 @@
-## Social Preview Verification — Findings & Fixes
 
-### Issues Found
 
-| # | Issue | Severity |
-|---|-------|----------|
-| 1 | **OG image is 1024×1024 JPEG** but `og:image:width/height` says 1200×630 — dimension mismatch | High |
-| 2 | **Filename not versioned** — social platforms cache aggressively; old square image may persist | Medium |
-| 3 | **JSON-LD logo** uses `travelagencyweb.com/images/logo.png` but OG images use `hearth-core-app.lovable.app` — inconsistent reachability | Low |
-| 4 | **SPA limitation** — social crawlers only see static `index.html` meta tags, not JS-rendered per-page metadata from MarketingLayout. Subpage shares (e.g. `/pricing`) will show homepage OG data | Known limitation |
+## Production Verification Plan — Critical & High Priority
 
-### What's Already Correct ✅
-- `og:url` and `canonical` → `travelagencyweb.com` ✅
-- `og:title`, `og:description`, `twitter:title`, `twitter:description` → correct ✅
-- `twitter:card` = `summary_large_image` ✅
-- `sitemap.xml` and `robots.txt` → `travelagencyweb.com` ✅
-- All 8 marketing pages pass title/description to MarketingLayout ✅
-- No old brand domain references remain ✅
+Based on codebase inspection, here are the findings and fixes needed.
 
-### Fixes to Apply
+---
 
-1. **Regenerate OG image** at exactly 1200×630 as `og-share-v2.png`
-2. **Update all references** in `index.html` and `MarketingLayout.tsx` to use `og-share-v2.png`
-3. **Update JSON-LD logo** to use `hearth-core-app.lovable.app` for reachability (until custom domain is live)
-4. **Delete old `og-share.png`** to avoid confusion
+### CRITICAL BLOCKERS
 
-### Files Changed
-- `public/images/og-share-v2.png` (new)
-- `public/images/og-share.png` (deleted)
-- `index.html`
-- `src/components/MarketingLayout.tsx`
+#### 1. OG Image Dimension Mismatch
+- **Status: FAIL**
+- **Finding**: `og-share-v2.png` is **1376x768** but `index.html` declares `og:image:width=1200` and `og:image:height=630`
+- **Root cause**: Image was generated at wrong dimensions
+- **Files to fix**: `public/images/og-share-v2.png` (regenerate at exactly 1200x630), verify `index.html` meta tags match
+- **Impact**: Facebook/LinkedIn may crop or reject the image; Twitter may show incorrectly
 
-### SPA Note (no code fix)
-Social crawlers (Facebook, Twitter, LinkedIn, WhatsApp) fetch HTML server-side and do NOT execute JavaScript. So MarketingLayout's dynamic meta updates only help in-browser (e.g., Google SPA rendering). For per-page social previews, you'd need SSR or pre-rendering — out of scope for now. The homepage metadata will apply to all shared URLs, which is acceptable.
+#### 2. Old Brand References Still Present (4 files)
+- **Status: FAIL**
+- **Finding**: "Skyline" and "GLOBEX" still appear in:
+  - `backend/src/services/notificationService.js` line 75: `"Skyline Travel"` in email subject
+  - `src/components/SmtpSettings.tsx` line 100: placeholder `"Skyline Travel"`
+  - `src/pages/admin/AdminSettings.tsx` line 324: placeholder `"GLOBEX Travel"`
+  - `src/pages/admin/AdminSettings.tsx` line 584: placeholder `"GLOBEX"`
+  - `src/pages/admin/AdminDomains.tsx` line 219: path `/var/www/skyline-frontend/dist`
+- **Root cause**: Incomplete find-and-replace during branding pass
+- **Files to fix**: All 4 files above
+
+#### 3. Stale Asset: `public/images/og-image.jpg`
+- **Status: FAIL**
+- **Finding**: Old `og-image.jpg` exists in `public/images/` but is referenced nowhere — dead asset that could cause confusion
+- **Fix**: Delete `public/images/og-image.jpg`
+
+---
+
+### HIGH PRIORITY CHECKS
+
+#### 4. SEO Metadata Consistency
+- **Status: PASS**
+- `index.html`: canonical, og:url → `travelagencyweb.com` ✓
+- `sitemap.xml`: all URLs → `travelagencyweb.com` ✓
+- `robots.txt`: sitemap → `travelagencyweb.com` ✓
+- JSON-LD: brand name, URL, offers all correct ✓
+
+#### 5. MarketingLayout Dynamic Meta Tags
+- **Status: PASS**
+- `PUBLISHED_DOMAIN` set to `hearth-core-app.lovable.app` for OG image reachability ✓
+- Dynamic updates for og:title, og:description, og:url, og:image, twitter:*, canonical ✓
+- All 8 marketing pages pass title/description props ✓
+
+#### 6. Social Crawler Reachability
+- **Status: PASS (with caveat)**
+- OG image URL points to `hearth-core-app.lovable.app` which is publicly reachable ✓
+- **Caveat**: Once `travelagencyweb.com` DNS is live, update `PUBLISHED_DOMAIN` in MarketingLayout.tsx and all `index.html` image URLs
+
+#### 7. Frontend Route Coverage
+- **Status: PASS**
+- All marketing pages (`/`, `/features`, `/pricing`, `/demo`, `/contact-us`, `/faq`, `/privacy`, `/terms`) routed in App.tsx ✓
+- Auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`) routed ✓
+
+---
+
+### FIXES TO IMPLEMENT (3 items)
+
+| # | Fix | Files |
+|---|-----|-------|
+| 1 | Regenerate `og-share-v2.png` at exactly 1200x630 | `public/images/og-share-v2.png` |
+| 2 | Replace old brand placeholders in 4 files | `notificationService.js`, `SmtpSettings.tsx`, `AdminSettings.tsx`, `AdminDomains.tsx` |
+| 3 | Delete stale `public/images/og-image.jpg` | Delete file |
+
+### POST-FIX BROWSER TESTING
+
+After fixes, manually verify:
+1. Homepage loads with correct logo and brand name in navbar/footer
+2. Share preview: publish app, paste URL into [Facebook Debugger](https://developers.facebook.com/tools/debug/) — confirm 1200x630 image renders
+3. Navigate to `/pricing`, `/features`, `/faq` — confirm no old brand names visible
+4. Check admin settings page — confirm placeholder text shows new brand
+
