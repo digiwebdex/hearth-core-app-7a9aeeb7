@@ -87,8 +87,8 @@ const defaultEmail: EmailSettings = {
   smtpSecure: false,
   smtpUser: "",
   smtpPass: "",
-  fromName: "GLOBEX Travel",
-  fromEmail: "noreply@globexconnect.com",
+  fromName: "TAWSS",
+  fromEmail: "noreply@travelagencyweb.com",
   enabled: false,
 };
 
