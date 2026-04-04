@@ -216,7 +216,7 @@ const AdminDomains = () => {
 server { listen 80; server_name ${redirect}; return 301 https://${primary}$request_uri; }
 server {
     listen 80; server_name ${primary};
-    root /var/www/skyline-frontend/dist; index index.html;
+    root /var/www/tawss-frontend/dist; index index.html;
     location / { try_files $uri $uri/ /index.html; }
 }
 EOF

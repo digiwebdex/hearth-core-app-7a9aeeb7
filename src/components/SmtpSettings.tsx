@@ -97,7 +97,7 @@ const SmtpSettings = () => {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>From Name</Label>
-              <Input placeholder="Skyline Travel" value={config.fromName} onChange={(e) => update("fromName", e.target.value)} required />
+              <Input placeholder="Travel Agency Website & Software Solution" value={config.fromName} onChange={(e) => update("fromName", e.target.value)} required />
             </div>
             <div className="space-y-2">
               <Label>From Email</Label>
