@@ -29,7 +29,7 @@ const MarketingLayout = ({ children, title, description }: Props) => {
   useEffect(() => {
     if (title) document.title = title;
     const pageUrl = `https://${DOMAIN}${location.pathname === "/" ? "" : location.pathname}`;
-    const ogImage = `https://${DOMAIN}/images/og-share.png`;
+    const ogImage = `https://${PUBLISHED_DOMAIN}/images/og-share.png`;
     if (description) {
       const setMeta = (sel: string, attr: string, val: string) => {
         let el = document.querySelector(sel);
