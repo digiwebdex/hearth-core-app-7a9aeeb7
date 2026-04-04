@@ -1,9 +1,11 @@
 import MarketingLayout from "@/components/MarketingLayout";
 
+const BRAND = "Travel Agency Website & Software Solution";
+
 const Terms = () => (
   <MarketingLayout
-    title="Terms of Service — Globex Connect"
-    description="Read the Globex Connect terms of service. Understand the rules and guidelines for using our travel agency management platform."
+    title={`Terms of Service — ${BRAND}`}
+    description={`Read the ${BRAND} terms of service. Understand the rules and guidelines for using our travel agency management platform.`}
   >
     <section className="py-16 md:py-20">
       <div className="container mx-auto px-4 max-w-3xl">
@@ -13,12 +15,12 @@ const Terms = () => (
         <div className="prose prose-invert max-w-none space-y-8 text-white/60 text-sm leading-relaxed">
           <section>
             <h2 className="text-lg font-bold text-white mb-2">1. Acceptance of Terms</h2>
-            <p>By accessing or using Globex Connect ("the Platform"), operated by DigiWebDex, you agree to be bound by these Terms of Service. If you do not agree, do not use the Platform.</p>
+            <p>By accessing or using {BRAND} ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Platform.</p>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-white mb-2">2. Description of Service</h2>
-            <p>Globex Connect is a multi-tenant software-as-a-service (SaaS) platform for travel agency management. The Platform provides tools for lead management, quotation building, booking operations, invoicing, payment tracking, vendor management, team collaboration, and reporting.</p>
+            <p>{BRAND} is a multi-tenant software-as-a-service (SaaS) platform for travel agency management. The Platform provides tools for lead management, quotation building, booking operations, invoicing, payment tracking, vendor management, team collaboration, and reporting.</p>
           </section>
 
           <section>
@@ -57,7 +59,7 @@ const Terms = () => (
 
           <section>
             <h2 className="text-lg font-bold text-white mb-2">8. Limitation of Liability</h2>
-            <p>To the maximum extent permitted by law, Globex Connect and DigiWebDex shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, business opportunities, or goodwill, arising from your use of the Platform.</p>
+            <p>To the maximum extent permitted by law, {BRAND} shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, business opportunities, or goodwill, arising from your use of the Platform.</p>
           </section>
 
           <section>
@@ -78,7 +80,7 @@ const Terms = () => (
           <section>
             <h2 className="text-lg font-bold text-white mb-2">12. Contact</h2>
             <p>For questions about these Terms of Service, contact us at:</p>
-            <p>Email: support@globexconnect.com<br />Phone: +880 1234-567890<br />Address: Dhaka, Bangladesh</p>
+            <p>Email: support@travelagencyweb.com<br />Phone: +880 1234-567890<br />Address: Dhaka, Bangladesh</p>
           </section>
         </div>
       </div>

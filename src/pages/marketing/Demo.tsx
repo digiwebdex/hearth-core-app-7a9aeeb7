@@ -36,8 +36,8 @@ const Demo = () => {
 
   return (
     <MarketingLayout
-      title="Book a Demo — Globex Connect | Travel Agency Software"
-      description="Schedule a personalized demo of Globex Connect. See how our travel agency management platform can streamline your operations."
+      title="Book a Demo — Travel Agency Website & Software Solution"
+      description="Schedule a personalized demo. See how our travel agency management platform can streamline your operations."
     >
       {/* Hero */}
       <section className="relative overflow-hidden py-16 md:py-24">
@@ -49,7 +49,7 @@ const Demo = () => {
             <Calendar className="mr-1.5 h-3.5 w-3.5 inline" />Free Personalized Demo
           </Badge>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-            See Globex Connect in Action
+            See Our Platform in Action
           </h1>
           <p className="text-lg text-white/50 max-w-2xl mx-auto">
             Book a 30-minute walkthrough tailored to your agency's workflow. We'll show you exactly how to manage leads, quotations, bookings, and payments.

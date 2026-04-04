@@ -56,7 +56,7 @@ export function getAuditLogs(): AuditLogEntry[] {
 
 export function seedAuditLogs() {
   if (auditLogs.length > 0) return;
-  const base = { actorId: "u-admin", actorName: "Super Admin", actorEmail: "admin@skyline.com", actorRole: "super_admin" };
+  const base = { actorId: "u-admin", actorName: "Super Admin", actorEmail: "admin@travelagencyweb.com", actorRole: "super_admin" };
   const tenant1 = { tenantId: "t1", tenantName: "Acme Travel" };
   const tenant2 = { tenantId: "t2", tenantName: "Globe Tours" };
 

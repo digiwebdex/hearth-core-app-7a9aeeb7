@@ -7,11 +7,11 @@ async function main() {
 
   // Super admin tenant
   const adminTenant = await prisma.tenant.create({
-    data: { name: "Skyline Platform", subscriptionPlan: "enterprise", subscriptionStatus: "active" },
+    data: { name: "TAWSS Platform", subscriptionPlan: "enterprise", subscriptionStatus: "active" },
   });
   const adminPass = await bcrypt.hash("admin123", 10);
   await prisma.user.create({
-    data: { name: "Super Admin", email: "admin@skyline.dev", password: adminPass, role: "super_admin", tenantId: adminTenant.id },
+    data: { name: "Super Admin", email: "admin@travelagencyweb.com", password: adminPass, role: "super_admin", tenantId: adminTenant.id },
   });
   await prisma.tenant.update({ where: { id: adminTenant.id }, data: { ownerId: adminTenant.id } });
 
@@ -62,7 +62,7 @@ async function main() {
   });
 
   console.log("✅ Seeding complete!");
-  console.log("   Super Admin: admin@skyline.dev / admin123");
+  console.log("   Super Admin: admin@travelagencyweb.com / admin123");
   console.log("   Demo User:   user@demo.com / demo123");
 }
 

@@ -1,9 +1,11 @@
 import MarketingLayout from "@/components/MarketingLayout";
 
+const BRAND = "Travel Agency Website & Software Solution";
+
 const Privacy = () => (
   <MarketingLayout
-    title="Privacy Policy — Globex Connect"
-    description="Read the Globex Connect privacy policy. Learn how we collect, use, and protect your data."
+    title={`Privacy Policy — ${BRAND}`}
+    description={`Read the ${BRAND} privacy policy. Learn how we collect, use, and protect your data.`}
   >
     <section className="py-16 md:py-20">
       <div className="container mx-auto px-4 max-w-3xl">
@@ -13,7 +15,7 @@ const Privacy = () => (
         <div className="prose prose-invert max-w-none space-y-8 text-white/60 text-sm leading-relaxed">
           <section>
             <h2 className="text-lg font-bold text-white mb-2">1. Introduction</h2>
-            <p>Globex Connect ("we", "our", "us") is a multi-tenant travel agency management platform operated by DigiWebDex. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.</p>
+            <p>{BRAND} ("we", "our", "us") is a multi-tenant travel agency management platform. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.</p>
           </section>
 
           <section>
@@ -40,7 +42,7 @@ const Privacy = () => (
 
           <section>
             <h2 className="text-lg font-bold text-white mb-2">4. Data Isolation & Multi-Tenancy</h2>
-            <p>Each agency on Globex Connect operates in a completely isolated workspace. Your business data (clients, bookings, invoices, vendor information) is never accessible to other agencies or tenants on the platform. Super-admin access is limited to platform management and does not include access to your operational data content.</p>
+            <p>Each agency on our platform operates in a completely isolated workspace. Your business data (clients, bookings, invoices, vendor information) is never accessible to other agencies or tenants on the platform. Super-admin access is limited to platform management and does not include access to your operational data content.</p>
           </section>
 
           <section>
@@ -65,7 +67,7 @@ const Privacy = () => (
 
           <section>
             <h2 className="text-lg font-bold text-white mb-2">8. Your Rights</h2>
-            <p>You have the right to access, correct, export, or delete your personal data. You can export most data through the platform's built-in export features. For account deletion or data requests, contact us at support@globexconnect.com.</p>
+            <p>You have the right to access, correct, export, or delete your personal data. You can export most data through the platform's built-in export features. For account deletion or data requests, contact us at support@travelagencyweb.com.</p>
           </section>
 
           <section>
@@ -76,7 +78,7 @@ const Privacy = () => (
           <section>
             <h2 className="text-lg font-bold text-white mb-2">10. Contact</h2>
             <p>If you have questions about this Privacy Policy, contact us at:</p>
-            <p>Email: support@globexconnect.com<br />Phone: +880 1234-567890<br />Address: Dhaka, Bangladesh</p>
+            <p>Email: support@travelagencyweb.com<br />Phone: +880 1234-567890<br />Address: Dhaka, Bangladesh</p>
           </section>
         </div>
       </div>

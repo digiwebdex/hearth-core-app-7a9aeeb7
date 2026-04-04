@@ -101,7 +101,7 @@ const SmtpSettings = () => {
             </div>
             <div className="space-y-2">
               <Label>From Email</Label>
-              <Input type="email" placeholder="noreply@skylinetravel.com" value={config.fromEmail} onChange={(e) => update("fromEmail", e.target.value)} required />
+              <Input type="email" placeholder="noreply@travelagencyweb.com" value={config.fromEmail} onChange={(e) => update("fromEmail", e.target.value)} required />
             </div>
           </div>
 

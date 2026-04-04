@@ -7,13 +7,13 @@ import DomainErrorPage from "@/components/DomainErrorPage";
 // Demo fallback
 const demoTenant: TenantPublic = {
   id: "demo",
-  name: "Skyline Travel & Tours",
-  slug: "skyline",
+  name: "Travel Agency Website & Software Solution",
+  slug: "tawss",
   description: "Your trusted partner for unforgettable travel experiences. We specialize in curated tours, flight bookings, hotel reservations, and visa assistance across the globe.",
   phone: "+880 1234-567890",
-  email: "info@skylinetravel.com",
+  email: "info@travelagencyweb.com",
   address: "123 Travel Plaza, Suite 400, Dhaka, Bangladesh",
-  website: "https://skylinetravel.com",
+  website: "https://travelagencyweb.com",
   socialLinks: { facebook: "#", instagram: "#", twitter: "#" },
 };
 

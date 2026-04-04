@@ -118,8 +118,8 @@ const featureGroups = [
 const Features = () => {
   return (
     <MarketingLayout
-      title="Features — Globex Connect | Travel Agency Software"
-      description="Explore all features of Globex Connect — leads, quotations, bookings, invoices, vendor management, reports, and Hajj/Umrah module for travel agencies."
+      title="Features — Travel Agency Website & Software Solution"
+      description="Explore all features — leads, quotations, bookings, invoices, vendor management, reports, and Hajj/Umrah module for travel agencies."
     >
       {/* Hero */}
       <section className="relative overflow-hidden py-20 md:py-28">
@@ -158,7 +158,7 @@ const Features = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-3">The Travel Agency Workflow</h2>
-            <p className="text-white/50">How Globex Connect takes you from inquiry to trip completion</p>
+            <p className="text-white/50">How our platform takes you from inquiry to trip completion</p>
           </div>
           <div className="flex flex-wrap justify-center gap-4 md:gap-2 max-w-5xl mx-auto">
             {[
@@ -216,7 +216,7 @@ const Features = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Modernize Your Travel Agency?</h2>
           <p className="text-white/50 max-w-xl mx-auto mb-8">
-            Join hundreds of travel agencies already using Globex Connect to manage their business end to end.
+            Join hundreds of travel agencies already using our platform to manage their business end to end.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/pricing">

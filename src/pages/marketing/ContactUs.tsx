@@ -31,8 +31,8 @@ const ContactUs = () => {
 
   return (
     <MarketingLayout
-      title="Contact Us — Globex Connect | Travel Agency Software"
-      description="Get in touch with Globex Connect for support, sales inquiries, or partnership opportunities."
+      title="Contact Us — Travel Agency Website & Software Solution"
+      description="Get in touch with us for support, sales inquiries, or partnership opportunities."
     >
       {/* Hero */}
       <section className="py-16 md:py-20">
@@ -95,7 +95,7 @@ const ContactUs = () => {
             <div className="lg:col-span-2 space-y-6">
               {[
                 { icon: Phone, title: "Phone", value: "+880 1234-567890", sub: "Sat-Thu, 9 AM - 7 PM" },
-                { icon: Mail, title: "Email", value: "support@globexconnect.com", sub: "We reply within 24 hours" },
+                { icon: Mail, title: "Email", value: "support@travelagencyweb.com", sub: "We reply within 24 hours" },
                 { icon: MapPin, title: "Office", value: "Dhaka, Bangladesh", sub: "By appointment only" },
                 { icon: Clock, title: "Business Hours", value: "Saturday - Thursday", sub: "9:00 AM - 7:00 PM (BST)" },
               ].map((item) => (

@@ -42,7 +42,7 @@ const Pricing = () => {
     setLoading(true);
     try {
       const newUser = await register({ name: form.ownerName, email: form.email, password: form.password, tenantName: form.companyName });
-      toast({ title: "Registration Successful!", description: `Welcome to Globex Connect — ${PLANS.find(p => p.id === selectedPlan)?.name} plan` });
+      toast({ title: "Registration Successful!", description: `Welcome — ${PLANS.find(p => p.id === selectedPlan)?.name} plan` });
       setDialogOpen(false);
       navigate(newUser.role === "owner" ? "/admin" : "/dashboard");
     } catch (err: any) {
@@ -57,7 +57,7 @@ const Pricing = () => {
 
   return (
     <MarketingLayout
-      title="Pricing — Globex Connect | Travel Agency Software"
+      title="Pricing — Travel Agency Website & Software Solution"
       description="Simple, transparent pricing for travel agencies. Start free and upgrade as your team grows. All plans include a 14-day free trial."
     >
       {/* Hero */}

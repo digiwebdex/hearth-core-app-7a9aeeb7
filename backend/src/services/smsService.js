@@ -91,13 +91,13 @@ const templates = {
     `Dear ${data.clientName}, we received your payment of ৳${data.amount} for Invoice ${data.invoiceNumber || "N/A"}. Due: ৳${data.dueAmount || 0}. Thank you!`,
 
   subscriptionActivated: (data) =>
-    `Your ${data.plan} plan is now active until ${data.expiryDate}. Enjoy full access to all features. — Skyline Travel`,
+    `Your ${data.plan} plan is now active until ${data.expiryDate}. Enjoy full access to all features. — Travel Agency Web`,
 
   subscriptionExpiring: (data) =>
-    `Your ${data.plan} plan expires on ${data.expiryDate}. Renew now to avoid interruption. — Skyline Travel`,
+    `Your ${data.plan} plan expires on ${data.expiryDate}. Renew now to avoid interruption. — Travel Agency Web`,
 
   passwordResetOtp: (data) =>
-    `Your password reset code is ${data.otp}. Valid for 10 minutes. Do not share. — Skyline Travel`,
+    `Your password reset code is ${data.otp}. Valid for 10 minutes. Do not share. — Travel Agency Web`,
 
   invoiceReminder: (data) =>
     `Reminder: Invoice ${data.invoiceNumber} for ৳${data.dueAmount} is due on ${data.dueDate}. Please make payment promptly.`,

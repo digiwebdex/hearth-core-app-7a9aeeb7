@@ -58,7 +58,7 @@ async function sendPasswordReset(email, resetToken) {
   const resetUrl = `${getFrontendUrl()}/reset-password?token=${resetToken}`;
   return sendEmail({
     to: email,
-    subject: "Password Reset - Skyline Travel",
+    subject: "Password Reset - Travel Agency Web",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
         <h2 style="color:#0f172a;">Password Reset Request</h2>
@@ -70,7 +70,7 @@ async function sendPasswordReset(email, resetToken) {
         </p>
         <p style="color:#666;font-size:14px;">This link expires in 1 hour. If you didn't request this, ignore this email.</p>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
     text: `Reset your password: ${resetUrl} (expires in 1 hour)`,
@@ -80,7 +80,7 @@ async function sendPasswordReset(email, resetToken) {
 async function sendDemoRequestConfirmation(data) {
   return sendEmail({
     to: data.email,
-    subject: "Demo Request Received - Skyline Travel",
+    subject: "Demo Request Received - Travel Agency Web",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
         <h2 style="color:#0f172a;">Thank You, ${data.name}!</h2>
@@ -89,7 +89,7 @@ async function sendDemoRequestConfirmation(data) {
         <strong>Team size:</strong> ${data.teamSize || "N/A"}</p>
         <p>In the meantime, feel free to explore our features at <a href="${getFrontendUrl()}/features">${getFrontendUrl()}/features</a>.</p>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
   });
@@ -118,14 +118,14 @@ async function sendDemoRequestNotification(data) {
 async function sendContactConfirmation(data) {
   return sendEmail({
     to: data.email,
-    subject: "We Received Your Message - Skyline Travel",
+    subject: "We Received Your Message - Travel Agency Web",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
         <h2 style="color:#0f172a;">Thank You, ${data.name}!</h2>
         <p>We've received your message and will respond within 24 hours.</p>
         <p style="color:#666;"><strong>Subject:</strong> ${data.subject || "General inquiry"}</p>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
   });
@@ -165,7 +165,7 @@ async function sendBookingConfirmation(booking, clientEmail) {
           <p><strong>Travelers:</strong> ${booking.travelerCount || "N/A"}</p>
         </div>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
   });
@@ -186,7 +186,7 @@ async function sendInvoiceEmail(invoice, clientEmail) {
           <p><strong>Due Date:</strong> ${invoice.dueDate || "N/A"}</p>
         </div>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
   });

@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Globe, Menu, X, Phone, Mail, MapPin } from "lucide-react";
+import { Menu, X, Phone, Mail, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
+import logoImg from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Features", path: "/features" },
@@ -16,6 +17,10 @@ interface Props {
   description?: string;
 }
 
+const BRAND = "Travel Agency Website & Software Solution";
+const BRAND_SHORT = "TAWSS";
+const DOMAIN = "travelagencyweb.com";
+
 const MarketingLayout = ({ children, title, description }: Props) => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,12 +32,11 @@ const MarketingLayout = ({ children, title, description }: Props) => {
       if (!meta) { meta = document.createElement("meta"); meta.setAttribute("name", "description"); document.head.appendChild(meta); }
       meta.setAttribute("content", description);
     }
-    // Set canonical for each page
     let canonical = document.querySelector('link[rel="canonical"]');
     if (canonical) {
-      canonical.setAttribute("href", `https://globexconnect.com${location.pathname === "/" ? "" : location.pathname}`);
+      canonical.setAttribute("href", `https://${DOMAIN}${location.pathname === "/" ? "" : location.pathname}`);
     }
-    return () => { document.title = "Globex Connect — Travel Agency Management Software"; };
+    return () => { document.title = `${BRAND} — Complete Travel Agency Management`; };
   }, [title, description, location.pathname]);
 
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
@@ -43,10 +47,9 @@ const MarketingLayout = ({ children, title, description }: Props) => {
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0a1628]/95 backdrop-blur">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2.5">
-            <Globe className="h-7 w-7 text-cyan-400" />
-            <span className="text-lg font-bold tracking-wide">
-              <span className="text-white">GLOBEX</span>{" "}
-              <span className="text-cyan-400">CONNECT</span>
+            <img src={logoImg} alt={BRAND} className="h-9 w-auto" />
+            <span className="text-lg font-bold tracking-wide hidden sm:inline">
+              <span className="text-white">{BRAND_SHORT}</span>
             </span>
           </Link>
 
@@ -114,11 +117,11 @@ const MarketingLayout = ({ children, title, description }: Props) => {
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Globe className="h-6 w-6 text-cyan-400" />
-                <span className="font-bold text-lg">GLOBEX CONNECT</span>
+                <img src={logoImg} alt={BRAND} className="h-8 w-auto" />
+                <span className="font-bold text-lg">{BRAND_SHORT}</span>
               </div>
               <p className="text-sm text-white/40 leading-relaxed">
-                The complete travel agency management platform. From inquiry to trip completion — manage leads, quotations, bookings, invoices, and vendors in one place.
+                {BRAND}. From inquiry to trip completion — manage leads, quotations, bookings, invoices, and vendors in one place.
               </p>
             </div>
             <div>
@@ -147,7 +150,7 @@ const MarketingLayout = ({ children, title, description }: Props) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-cyan-400/60" />
-                  <span>support@globexconnect.com</span>
+                  <span>support@travelagencyweb.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-cyan-400/60" />
@@ -158,7 +161,7 @@ const MarketingLayout = ({ children, title, description }: Props) => {
           </div>
           <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-white/30">
-              © {new Date().getFullYear()} Globex Connect. All rights reserved. Powered by DigiWebDex.
+              © {new Date().getFullYear()} {BRAND}. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-white/30">
               <Link to="/privacy" className="hover:text-white/50">Privacy</Link>
