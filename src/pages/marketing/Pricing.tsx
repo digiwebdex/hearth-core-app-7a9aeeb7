@@ -57,7 +57,7 @@ const Pricing = () => {
 
   return (
     <MarketingLayout
-      title="Pricing — Globex Connect | Travel Agency Software"
+      title="Pricing — Travel Agency Website & Software Solution"
       description="Simple, transparent pricing for travel agencies. Start free and upgrade as your team grows. All plans include a 14-day free trial."
     >
       {/* Hero */}
