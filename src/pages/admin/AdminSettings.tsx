@@ -71,14 +71,14 @@ interface SmsSettings {
 
 // ── Defaults ──
 const defaultGeneral: GeneralSettings = {
-  appName: "GLOBEX Travel SaaS",
+  appName: "Travel Agency Website & Software Solution",
   logoUrl: "",
   currency: "BDT",
   currencySymbol: "৳",
   timezone: "Asia/Dhaka",
   maintenanceMode: false,
-  supportEmail: "support@globexconnect.com",
-  metaDescription: "Travel Agency Software - Manage your travel business with GLOBEX",
+  supportEmail: "support@travelagencyweb.com",
+  metaDescription: "Complete Travel Agency Website & Software Solution",
 };
 
 const defaultEmail: EmailSettings = {
