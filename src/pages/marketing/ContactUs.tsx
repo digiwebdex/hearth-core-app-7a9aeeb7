@@ -31,8 +31,8 @@ const ContactUs = () => {
 
   return (
     <MarketingLayout
-      title="Contact Us — Globex Connect | Travel Agency Software"
-      description="Get in touch with Globex Connect for support, sales inquiries, or partnership opportunities."
+      title="Contact Us — Travel Agency Website & Software Solution"
+      description="Get in touch with us for support, sales inquiries, or partnership opportunities."
     >
       {/* Hero */}
       <section className="py-16 md:py-20">
