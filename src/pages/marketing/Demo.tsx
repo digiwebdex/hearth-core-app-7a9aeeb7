@@ -49,7 +49,7 @@ const Demo = () => {
             <Calendar className="mr-1.5 h-3.5 w-3.5 inline" />Free Personalized Demo
           </Badge>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-            See Globex Connect in Action
+            See Our Platform in Action
           </h1>
           <p className="text-lg text-white/50 max-w-2xl mx-auto">
             Book a 30-minute walkthrough tailored to your agency's workflow. We'll show you exactly how to manage leads, quotations, bookings, and payments.

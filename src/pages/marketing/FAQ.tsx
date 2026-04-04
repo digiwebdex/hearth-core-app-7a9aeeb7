@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, HelpCircle, MessageCircle } from "lucide-react";
 
+const BRAND = "Travel Agency Website & Software Solution";
+
 const faqCategories = [
   {
     category: "General",
     questions: [
-      { q: "What is Globex Connect?", a: "Globex Connect is a complete travel agency management platform. It helps you manage leads, create quotations, confirm bookings, generate invoices, track payments, handle vendors, and run reports — all in one place. It's built specifically for travel agencies and tour operators." },
-      { q: "Who is Globex Connect designed for?", a: "It's designed for travel agencies, tour operators, Hajj/Umrah service providers, and any business that handles travel bookings. Whether you're a single-person agency or a team of 50+, the platform scales with your needs." },
-      { q: "Can I use Globex Connect for Hajj and Umrah services?", a: "Yes. We have a dedicated Hajj/Umrah module that handles pilgrim registration, package creation with hotel class and transport, room allocation, family grouping, mahram tracking, installment plans, and departure management." },
-      { q: "Do I need any technical knowledge to use this?", a: "No. Globex Connect is designed for travel professionals, not developers. The interface is straightforward — if you can use Facebook or WhatsApp, you can use Globex Connect." },
+      { q: `What is ${BRAND}?`, a: `${BRAND} is a complete travel agency management platform. It helps you manage leads, create quotations, confirm bookings, generate invoices, track payments, handle vendors, and run reports — all in one place. It's built specifically for travel agencies and tour operators.` },
+      { q: `Who is this platform designed for?`, a: "It's designed for travel agencies, tour operators, Hajj/Umrah service providers, and any business that handles travel bookings. Whether you're a single-person agency or a team of 50+, the platform scales with your needs." },
+      { q: "Can I use this for Hajj and Umrah services?", a: "Yes. We have a dedicated Hajj/Umrah module that handles pilgrim registration, package creation with hotel class and transport, room allocation, family grouping, mahram tracking, installment plans, and departure management." },
+      { q: "Do I need any technical knowledge to use this?", a: "No. Our platform is designed for travel professionals, not developers. The interface is straightforward — if you can use Facebook or WhatsApp, you can use our platform." },
     ],
   },
   {
@@ -61,8 +63,8 @@ const FAQ = () => {
 
   return (
     <MarketingLayout
-      title="FAQ — Globex Connect | Travel Agency Software"
-      description="Frequently asked questions about Globex Connect — pricing, features, security, and support for travel agencies and tour operators."
+      title={`FAQ — ${BRAND}`}
+      description={`Frequently asked questions about ${BRAND} — pricing, features, security, and support for travel agencies and tour operators.`}
     >
       {/* Hero */}
       <section className="py-16 md:py-24">
@@ -74,7 +76,7 @@ const FAQ = () => {
             Frequently Asked Questions
           </h1>
           <p className="text-lg text-white/50 max-w-2xl mx-auto">
-            Everything you need to know about Globex Connect. Can't find what you're looking for? <Link to="/contact-us" className="text-cyan-400 hover:underline">Contact our team</Link>.
+            Everything you need to know about our platform. Can't find what you're looking for? <Link to="/contact-us" className="text-cyan-400 hover:underline">Contact our team</Link>.
           </p>
         </div>
       </section>
@@ -129,7 +131,7 @@ const FAQ = () => {
               </Button>
             </Link>
             <Link to="/contact-us">
-              <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 px-8">
+              <Button size="lg" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/5 px-8">
                 Contact Support
               </Button>
             </Link>
