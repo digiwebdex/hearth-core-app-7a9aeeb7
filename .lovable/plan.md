@@ -1,29 +1,57 @@
 
-## Phase 1: Verify P0-P2 Fixes
+## Phase 1: Verify Deployment Safety
+Read and audit: emailService.js, cron.js, auth.js, invoices.js, accounts.js, contact.js, demo.js — confirm all production-safe.
 
-1. **Forgot password flow** — Check auth.js has forgot-password/reset-password routes, frontend pages exist, API lib has methods, Login has link
-2. **Auto-transaction on invoice payment** — Check invoices.js POST /:id/payments creates Transaction record
-3. **Accounts profitability** — Check accounts.js GET /profitability with date filters
-4. **Audit logs** — Verify login/logout/invoice-create/invoice-payment/lead-conversion/subscription-approval all create auditLog entries
-5. **Route wiring** — Check index.js mounts all routes, App.tsx has all page routes
+## Phase 2: Payment Gateway Backend
+1. **SSLCommerz route** (`backend/src/routes/sslcommerz.js`):
+   - POST /initiate — creates session with SSLCommerz API, returns redirect URL
+   - POST /success, /fail, /cancel — IPN callbacks
+   - POST /ipn — server-to-server validation
+   - Links payment to invoice or payment-request
+   - Updates invoice/booking/subscription status
+   - Audit logs all events
 
-## Phase 2: Missing Production Items
+2. **bKash route** (`backend/src/routes/bkash.js`):
+   - POST /create — creates bKash payment
+   - POST /execute — executes after user approval
+   - POST /callback — webhook handler
+   - Same linkage and audit logging
 
-1. **Demo form backend** — New route `POST /api/demo-requests` to save demo form submissions to DB + send email notification
-2. **Contact form backend** — New route `POST /api/contact` to save contact form submissions + send email notification  
-3. **Schema** — Add DemoRequest and ContactSubmission models to Prisma
-4. **SMTP email service** — Create `backend/src/services/emailService.js` using nodemailer, centralize all email sending
-5. **Frontend wiring** — Connect Demo.tsx and ContactUs.tsx + SiteContact.tsx to real API endpoints
-6. **Nodemailer** — Already in package.json or needs adding; ensure consistent usage across auth.js and new email service
+3. **Payment gateway service** (`backend/src/services/paymentGateway.js`):
+   - Abstraction layer for SSLCommerz + bKash
+   - Shared validation, status mapping, invoice/subscription update logic
 
-## Files to change
-- backend/prisma/schema.prisma (add DemoRequest, ContactSubmission)
-- backend/src/services/emailService.js (new — centralized SMTP)
-- backend/src/routes/contact.js (new)
-- backend/src/routes/demo.js (new)
+4. Mount routes in index.js, update frontend PaymentGatewayDialog to use real endpoints
+
+## Phase 3: Communication Abstraction
+1. **SMS service** (`backend/src/services/smsService.js`):
+   - Provider abstraction (Twilio, local BD providers)
+   - sendSms(to, message) with console fallback
+   - Templates for booking confirmation, payment received, password reset OTP
+
+2. **WhatsApp service** (`backend/src/services/whatsappService.js`):
+   - Provider abstraction (Twilio WhatsApp, WhatsApp Business API)
+   - sendWhatsApp(to, template, params) with console fallback
+
+3. **Notification engine** (`backend/src/services/notificationService.js`):
+   - Event-based: booking_confirmed, payment_received, subscription_activated, password_reset
+   - Dispatches to email + SMS + WhatsApp based on config
+   - Non-blocking, error-tolerant
+
+## Files to create/modify
+- backend/src/services/paymentGateway.js (new)
+- backend/src/routes/sslcommerz.js (new)
+- backend/src/routes/bkash.js (new)
+- backend/src/services/smsService.js (new)
+- backend/src/services/whatsappService.js (new)
+- backend/src/services/notificationService.js (new)
 - backend/src/index.js (mount new routes)
-- src/pages/marketing/Demo.tsx (connect to API)
-- src/pages/marketing/ContactUs.tsx (connect to API)
-- src/pages/site/SiteContact.tsx (connect to API)
-- src/lib/api.ts or src/lib/publicApi.ts (add API methods)
-- backend/src/routes/auth.js (refactor to use emailService)
+- src/lib/paymentGatewayApi.ts (update to real endpoints)
+- backend/.env.example (add all new env vars)
+
+## Env vars needed
+- SSLCOMMERZ_STORE_ID, SSLCOMMERZ_STORE_PASSWORD, SSLCOMMERZ_SANDBOX (payment)
+- BKASH_APP_KEY, BKASH_APP_SECRET, BKASH_USERNAME, BKASH_PASSWORD, BKASH_SANDBOX (payment)
+- PAYMENT_SUCCESS_URL, PAYMENT_FAIL_URL, PAYMENT_CANCEL_URL, PAYMENT_IPN_URL (callbacks)
+- SMS_PROVIDER, SMS_API_KEY, SMS_SENDER_ID (SMS)
+- WHATSAPP_PROVIDER, WHATSAPP_API_KEY, WHATSAPP_FROM_NUMBER (WhatsApp)
