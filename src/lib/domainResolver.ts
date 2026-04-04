@@ -48,7 +48,7 @@ export function resolveHostname(): DomainResolution {
   const hostname = window.location.hostname.toLowerCase();
 
   // Dev / preview environments → main app
-  if (!APP_DOMAIN || hostname === "localhost" || hostname.includes("lovable.app") || hostname === "127.0.0.1") {
+  if (!APP_DOMAIN || hostname === "localhost" || hostname === "127.0.0.1") {
     return { type: "main-app", hostname };
   }
 

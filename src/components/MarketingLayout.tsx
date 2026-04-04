@@ -20,7 +20,7 @@ interface Props {
 const BRAND = "Travel Agency Website & Software Solution";
 const BRAND_SHORT = "TAWSS";
 const DOMAIN = "travelagencyweb.com";
-const PUBLISHED_DOMAIN = "hearth-core-app.lovable.app";
+const PUBLISHED_DOMAIN = "travelagencyweb.com";
 
 const MarketingLayout = ({ children, title, description }: Props) => {
   const location = useLocation();
