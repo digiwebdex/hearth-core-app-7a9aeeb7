@@ -19,11 +19,15 @@ const SiteContact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    // Simulate send — connect to backend API
-    await new Promise((r) => setTimeout(r, 800));
-    toast({ title: "Message sent!", description: "We'll get back to you within 24 hours." });
-    setForm({ name: "", email: "", phone: "", message: "" });
-    setSending(false);
+    try {
+      await publicApi.submitContact({ ...form, tenantSlug: tenant.slug || undefined });
+      toast({ title: "Message sent!", description: "We'll get back to you within 24 hours." });
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to send. Please try again.", variant: "destructive" });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (

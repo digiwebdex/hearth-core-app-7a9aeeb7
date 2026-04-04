@@ -43,4 +43,21 @@ export const publicApi = {
     publicRequest<TenantPublic>(`/public/domain/${normalizeDomain(domain)}`),
   getPackagesByDomain: (domain: string) =>
     publicRequest<PackagePublic[]>(`/public/domain/${normalizeDomain(domain)}/packages`),
+  submitContact: (data: { name: string; email: string; phone?: string; subject?: string; message: string; tenantSlug?: string }) =>
+    publicPost<{ success: boolean; id: string }>("/contact", data),
+  submitDemo: (data: { name: string; email: string; phone?: string; company?: string; teamSize?: string; message?: string }) =>
+    publicPost<{ success: boolean; id: string }>("/demo-requests", data),
 };
+
+async function publicPost<T>(path: string, body: Record<string, unknown>): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err.message || "Request failed");
+  }
+  return res.json();
+}
