@@ -89,7 +89,7 @@ async function sendDemoRequestConfirmation(data) {
         <strong>Team size:</strong> ${data.teamSize || "N/A"}</p>
         <p>In the meantime, feel free to explore our features at <a href="${getFrontendUrl()}/features">${getFrontendUrl()}/features</a>.</p>
         <hr style="margin-top:30px;border:none;border-top:1px solid #eee;" />
-        <p style="color:#999;font-size:12px;">Skyline Travel Agency Software</p>
+        <p style="color:#999;font-size:12px;">Travel Agency Website & Software Solution</p>
       </div>
     `,
   });
