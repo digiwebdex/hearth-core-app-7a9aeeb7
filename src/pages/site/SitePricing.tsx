@@ -123,7 +123,7 @@ const SitePricing = () => {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/site" className="flex items-center gap-2">
             <Plane className="h-6 w-6 text-primary" />
-            <span className="text-lg font-bold">GLOBEX</span>
+            <span className="text-lg font-bold">TAWSS</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/site" className="text-sm text-muted-foreground hover:text-primary">Home</Link>
