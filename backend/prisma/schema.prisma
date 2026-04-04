@@ -665,6 +665,32 @@ model PaymentRequest {
   createdAt       DateTime @default(now())
 }
 
+// ── Demo Requests (public, no auth) ──
+model DemoRequest {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  teamSize  String?
+  message   String?
+  status    String   @default("new") // new | contacted | scheduled | completed
+  createdAt DateTime @default(now())
+}
+
+// ── Contact Submissions (public, no auth) ──
+model ContactSubmission {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  phone      String?
+  subject    String?
+  message    String
+  tenantSlug String?
+  status     String   @default("new") // new | read | replied
+  createdAt  DateTime @default(now())
+}
+
 // ── Audit Logs ──
 model AuditLog {
   id          String   @id @default(uuid())

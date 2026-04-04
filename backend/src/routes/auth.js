@@ -121,27 +121,8 @@ router.post("/forgot-password", async (req, res) => {
     // If SMTP is configured, send email. Otherwise log to console.
     const resetUrl = `${process.env.FRONTEND_URL || "https://travelagencyweb.com"}/reset-password?token=${resetToken}`;
 
-    if (process.env.SMTP_HOST) {
-      try {
-        const nodemailer = require("nodemailer");
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
-          port: parseInt(process.env.SMTP_PORT || "587"),
-          secure: process.env.SMTP_SECURE === "true",
-          auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-        });
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || "noreply@travelagencyweb.com",
-          to: email,
-          subject: "Password Reset - Skyline Travel",
-          html: `<p>Click the link below to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>This link expires in 1 hour.</p>`,
-        });
-      } catch (e) {
-        console.error("SMTP send error:", e.message);
-      }
-    } else {
-      console.log(`[FORGOT PASSWORD] Reset link for ${email}: ${resetUrl}`);
-    }
+    const { sendPasswordReset } = require("../services/emailService");
+    await sendPasswordReset(email, resetToken);
 
     res.json({ message: "If an account exists with that email, a reset link has been sent." });
   } catch (err) {
