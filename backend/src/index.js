@@ -34,7 +34,7 @@ app.use("/api/leads", require("./routes/leads"));
 app.use("/api/tasks", require("./routes/crud")("task"));
 app.use("/api/bookings", require("./routes/bookings"));
 app.use("/api/invoices", require("./routes/invoices"));
-app.use("/api/payments", require("./routes/crud")("payment"));
+app.use("/api/payments", require("./routes/payments"));
 app.use("/api/quotations", require("./routes/quotations"));
 app.use("/api/accounts", require("./routes/accounts"));
 app.use("/api/transactions", require("./routes/crud")("transaction"));
