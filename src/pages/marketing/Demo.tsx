@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, CheckCircle2, Clock, Monitor, Users, Zap } from "lucide-react";
+import { publicApi } from "@/lib/publicApi";
 
 const Demo = () => {
   const { toast } = useToast();
