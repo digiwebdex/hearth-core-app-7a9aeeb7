@@ -19,7 +19,7 @@ jobs:
           script: |
             set -e
             echo "═══ Pulling latest code ═══"
-            cd /var/www/tawss-frontend
+            cd /var/www/hearth-core-app
             git pull origin main
 
             echo "═══ Building frontend ═══"
@@ -27,9 +27,8 @@ jobs:
             npm run build
 
             echo "═══ Deploying backend ═══"
-            cd /var/www/tawss-frontend/backend
+            cd /var/www/hearth-core-app/backend
 
-            # Create .env if not exists
             if [ ! -f .env ]; then
               echo "⚠️  Backend .env not found! Run SETUP-VPS.sh first."
               exit 1
@@ -39,8 +38,7 @@ jobs:
             npx prisma generate
             npx prisma db push --accept-data-loss
 
-            # Restart PM2
-            pm2 describe tawss-api > /dev/null 2>&1 && pm2 restart tawss-api || pm2 start src/index.js --name "tawss-api"
+            pm2 describe hearth-core-api > /dev/null 2>&1 && pm2 restart hearth-core-api || pm2 start src/index.js --name "hearth-core-api"
             pm2 save
 
             echo "═══ Reloading Nginx ═══"

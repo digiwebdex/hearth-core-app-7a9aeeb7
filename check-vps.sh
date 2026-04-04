@@ -5,7 +5,7 @@
 # ══════════════════════════════════════════════════════════════
 
 echo "╔══════════════════════════════════════════════════════╗"
-echo "║   Skyline Travel SaaS — VPS Diagnostic Report       ║"
+echo "║   Hearth Core App — VPS Diagnostic Report         ║"
 echo "╚══════════════════════════════════════════════════════╝"
 echo ""
 echo "Date: $(date)"
@@ -149,5 +149,4 @@ else
 fi
 echo ""
 echo "═══ DONE ═══"
-echo "Copy the output above and share it with Lovable so I can"
-echo "generate the exact deployment config for your VPS."
+echo "Run bash backend/SETUP-VPS.sh to deploy."
