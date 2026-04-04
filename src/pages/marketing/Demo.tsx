@@ -36,8 +36,8 @@ const Demo = () => {
 
   return (
     <MarketingLayout
-      title="Book a Demo — Globex Connect | Travel Agency Software"
-      description="Schedule a personalized demo of Globex Connect. See how our travel agency management platform can streamline your operations."
+      title="Book a Demo — Travel Agency Website & Software Solution"
+      description="Schedule a personalized demo. See how our travel agency management platform can streamline your operations."
     >
       {/* Hero */}
       <section className="relative overflow-hidden py-16 md:py-24">
