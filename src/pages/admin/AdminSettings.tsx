@@ -325,7 +325,7 @@ const AdminSettings = () => {
                   </div>
                   <div className="space-y-2">
                     <Label>From Email</Label>
-                    <Input type="email" placeholder="noreply@globexconnect.com" value={email.fromEmail} onChange={(e) => setEmail({ ...email, fromEmail: e.target.value })} />
+                    <Input type="email" placeholder="noreply@travelagencyweb.com" value={email.fromEmail} onChange={(e) => setEmail({ ...email, fromEmail: e.target.value })} />
                   </div>
                 </div>
 
@@ -499,7 +499,7 @@ const AdminSettings = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Main Domain</Label>
-                    <Input value={domain.mainDomain} onChange={(e) => setDomain({ ...domain, mainDomain: e.target.value })} placeholder="travelsaas.digiwebdex.com" />
+                    <Input value={domain.mainDomain} onChange={(e) => setDomain({ ...domain, mainDomain: e.target.value })} placeholder="travelagencyweb.com" />
                     <p className="text-xs text-muted-foreground">The primary domain where the platform is hosted</p>
                   </div>
                   <div className="space-y-2">
@@ -511,7 +511,7 @@ const AdminSettings = () => {
 
                 <div className="space-y-2">
                   <Label>Default Subdomain Pattern</Label>
-                  <Input value={domain.defaultSubdomain} onChange={(e) => setDomain({ ...domain, defaultSubdomain: e.target.value })} placeholder="{company}.travelsaas.digiwebdex.com" />
+                  <Input value={domain.defaultSubdomain} onChange={(e) => setDomain({ ...domain, defaultSubdomain: e.target.value })} placeholder="{company}.travelagencyweb.com" />
                   <p className="text-xs text-muted-foreground">Use {"{company}"} as placeholder for tenant name</p>
                 </div>
 
