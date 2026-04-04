@@ -49,6 +49,13 @@ app.use("/api/audit-logs", require("./routes/auditLogs"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/admin/domains", require("./routes/domains"));
 
+// Public form routes (no auth)
+app.use("/api/contact", require("./routes/contact"));
+app.use("/api/demo-requests", require("./routes/demo"));
+
+// Email routes (authenticated)
+app.use("/api/email", require("./routes/email"));
+
 // Cron routes (protected by CRON_SECRET, not JWT)
 app.use("/api/cron", require("./routes/cron"));
 

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, CheckCircle2, Clock, Monitor, Users, Zap } from "lucide-react";
+import { publicApi } from "@/lib/publicApi";
 
 const Demo = () => {
   const { toast } = useToast();
@@ -22,10 +23,15 @@ const Demo = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    toast({ title: "Demo Request Submitted!", description: "Our team will contact you within 24 hours to schedule your personalized demo." });
-    setForm({ name: "", email: "", phone: "", company: "", teamSize: "", message: "" });
-    setLoading(false);
+    try {
+      await publicApi.submitDemo(form);
+      toast({ title: "Demo Request Submitted!", description: "Our team will contact you within 24 hours to schedule your personalized demo." });
+      setForm({ name: "", email: "", phone: "", company: "", teamSize: "", message: "" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to submit. Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

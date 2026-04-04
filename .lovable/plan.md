@@ -1,39 +1,29 @@
 
-# P2 Fix Plan
+## Phase 1: Verify P0-P2 Fixes
 
-## 1. Forgot Password Flow
-- Add `POST /api/auth/forgot-password` — generates a reset token, stores it in DB
-- Add `POST /api/auth/reset-password` — validates token, updates password
-- Add `resetToken` and `resetTokenExpiry` fields to User model in schema.prisma
-- Add frontend `/forgot-password` and `/reset-password` pages
-- **Email**: Since no SMTP is configured, the reset token/link will be returned in response for now (log to console on server). Add `SMTP_*` env vars as optional — when configured, sends real email.
+1. **Forgot password flow** — Check auth.js has forgot-password/reset-password routes, frontend pages exist, API lib has methods, Login has link
+2. **Auto-transaction on invoice payment** — Check invoices.js POST /:id/payments creates Transaction record
+3. **Accounts profitability** — Check accounts.js GET /profitability with date filters
+4. **Audit logs** — Verify login/logout/invoice-create/invoice-payment/lead-conversion/subscription-approval all create auditLog entries
+5. **Route wiring** — Check index.js mounts all routes, App.tsx has all page routes
 
-## 2. Auto-Create Transaction on Invoice Payment
-- In `invoices.js` POST `/:id/payments` handler, after recording payment, auto-create a Transaction record linked to the invoice/booking
-- No schema change needed — Transaction model already has `invoiceId`, `bookingId`, `referenceId`, `referenceType` fields
+## Phase 2: Missing Production Items
 
-## 3. Accounts Profitability Endpoint
-- Check `backend/src/routes/accounts.js` for existing endpoints
-- Add/verify `GET /api/accounts/profitability` — aggregates booking profit, expenses, net profit by period
+1. **Demo form backend** — New route `POST /api/demo-requests` to save demo form submissions to DB + send email notification
+2. **Contact form backend** — New route `POST /api/contact` to save contact form submissions + send email notification  
+3. **Schema** — Add DemoRequest and ContactSubmission models to Prisma
+4. **SMTP email service** — Create `backend/src/services/emailService.js` using nodemailer, centralize all email sending
+5. **Frontend wiring** — Connect Demo.tsx and ContactUs.tsx + SiteContact.tsx to real API endpoints
+6. **Nodemailer** — Already in package.json or needs adding; ensure consistent usage across auth.js and new email service
 
-## 4. Expanded Audit Log Coverage
-- **Login**: Add audit log in `POST /api/auth/login`
-- **Invoice create**: Add audit log in `POST /api/invoices`
-- **Invoice payment**: Add audit log in `POST /api/invoices/:id/payments`
-- **Lead conversion**: Add audit log in `POST /api/leads/:id/convert`
-- **Team member add/remove**: Already added in P1 tenants.js ✓
-- **Subscription approval**: Add audit log in admin `PATCH /api/admin/payment-requests/:id`
-
-## Files to change:
-- `backend/prisma/schema.prisma` — add resetToken/resetTokenExpiry to User
-- `backend/src/routes/auth.js` — forgot-password + reset-password + login audit
-- `backend/src/routes/invoices.js` — auto-create transaction + audit logs
-- `backend/src/routes/leads.js` — lead conversion audit log
-- `backend/src/routes/accounts.js` — profitability endpoint
-- `backend/src/routes/admin.js` — subscription approval audit log
-- `src/pages/ForgotPassword.tsx` — NEW frontend page
-- `src/pages/ResetPassword.tsx` — NEW frontend page
-- `src/App.tsx` — add routes
-- `src/lib/api.ts` — add forgotPassword/resetPassword API calls
-
-## No breaking changes to existing flows.
+## Files to change
+- backend/prisma/schema.prisma (add DemoRequest, ContactSubmission)
+- backend/src/services/emailService.js (new — centralized SMTP)
+- backend/src/routes/contact.js (new)
+- backend/src/routes/demo.js (new)
+- backend/src/index.js (mount new routes)
+- src/pages/marketing/Demo.tsx (connect to API)
+- src/pages/marketing/ContactUs.tsx (connect to API)
+- src/pages/site/SiteContact.tsx (connect to API)
+- src/lib/api.ts or src/lib/publicApi.ts (add API methods)
+- backend/src/routes/auth.js (refactor to use emailService)

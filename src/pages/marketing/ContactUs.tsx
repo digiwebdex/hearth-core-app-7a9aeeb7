@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Mail, MapPin, Clock, Send, MessageCircle } from "lucide-react";
+import { publicApi } from "@/lib/publicApi";
 
 const ContactUs = () => {
   const { toast } = useToast();
@@ -17,10 +18,15 @@ const ContactUs = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    toast({ title: "Message Sent!", description: "We'll get back to you within 24 hours." });
-    setForm({ name: "", email: "", phone: "", subject: "", message: "" });
-    setLoading(false);
+    try {
+      await publicApi.submitContact(form);
+      toast({ title: "Message Sent!", description: "We'll get back to you within 24 hours." });
+      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to send. Please try again.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
