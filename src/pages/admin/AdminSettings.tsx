@@ -321,7 +321,7 @@ const AdminSettings = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>From Name</Label>
-                    <Input placeholder="GLOBEX Travel" value={email.fromName} onChange={(e) => setEmail({ ...email, fromName: e.target.value })} />
+                    <Input placeholder="Travel Agency Website & Software Solution" value={email.fromName} onChange={(e) => setEmail({ ...email, fromName: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <Label>From Email</Label>
