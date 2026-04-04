@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Mail, MapPin, Clock, Send, MessageCircle } from "lucide-react";
+import { publicApi } from "@/lib/publicApi";
 
 const ContactUs = () => {
   const { toast } = useToast();
