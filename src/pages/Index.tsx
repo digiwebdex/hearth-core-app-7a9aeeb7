@@ -19,6 +19,8 @@ import {
   Target, FileText, Store, UserCheck, MapPin, ChevronDown, Quote,
 } from "lucide-react";
 
+const BRAND = "Travel Agency Website & Software Solution";
+
 const planIcons: Record<string, React.ElementType> = { free: Star, basic: Zap, pro: Crown, business: Rocket, enterprise: Gem };
 
 const features = [
@@ -33,15 +35,15 @@ const features = [
 ];
 
 const testimonials = [
-  { name: "Rafiq Ahmed", role: "Owner, Al-Baraka Tours", text: "Before Globex Connect, we managed everything on spreadsheets. Now our team handles 3x more bookings with less confusion. The quotation-to-booking flow alone saved us hours every week." },
+  { name: "Rafiq Ahmed", role: "Owner, Al-Baraka Tours", text: "Before this platform, we managed everything on spreadsheets. Now our team handles 3x more bookings with less confusion. The quotation-to-booking flow alone saved us hours every week." },
   { name: "Fatima Begum", role: "Operations Manager, Skyway Travel", text: "The vendor payable tracking is a game changer. We finally know exactly how much we owe each hotel and transport partner — and our profit margins are visible in real time." },
   { name: "Kamal Hossain", role: "Director, Noor Hajj Services", text: "The Hajj/Umrah module is exactly what we needed. Managing 500+ pilgrims with room allocation, installment plans, and document tracking used to be a nightmare. Not anymore." },
 ];
 
 const faqItems = [
-  { q: "Who is Globex Connect for?", a: "It's built for travel agencies, tour operators, ticketing offices, and Hajj/Umrah service providers in Bangladesh and beyond." },
+  { q: "Who is this platform for?", a: "It's built for travel agencies, tour operators, ticketing offices, and Hajj/Umrah service providers in Bangladesh and beyond." },
   { q: "Is there a free plan?", a: "Yes — start with up to 50 clients and 50 bookings for free. Upgrade when you're ready." },
-  { q: "Do I need technical skills?", a: "No. If you can use WhatsApp, you can use Globex Connect. No coding or IT team required." },
+  { q: "Do I need technical skills?", a: "No. If you can use WhatsApp, you can use our platform. No coding or IT team required." },
   { q: "Can I try paid features before committing?", a: "All paid plans include a 14-day free trial with full feature access. No credit card needed." },
 ];
 
@@ -62,7 +64,7 @@ const Index = () => {
     setLoading(true);
     try {
       const newUser = await register({ name: form.ownerName, email: form.email, password: form.password, tenantName: form.companyName });
-      toast({ title: "Registration Successful!", description: `Welcome to Globex Connect — ${PLANS.find(p => p.id === selectedPlan)?.name} plan` });
+      toast({ title: "Registration Successful!", description: `Welcome — ${PLANS.find(p => p.id === selectedPlan)?.name} plan` });
       setDialogOpen(false);
       navigate(newUser.role === "owner" ? "/admin" : "/dashboard");
     } catch (err: any) {
@@ -76,7 +78,7 @@ const Index = () => {
 
   return (
     <MarketingLayout
-      title="Globex Connect — Complete Travel Agency Management Software"
+      title={`${BRAND} — Complete Travel Agency Management`}
       description="Manage your travel agency online — leads, quotations, bookings, invoices, payments, vendors, reports, and Hajj/Umrah. Built for agencies in Bangladesh."
     >
       {/* ───── Hero ───── */}
@@ -255,7 +257,7 @@ const Index = () => {
           <div className="text-center mb-16">
             <Badge className="mb-4 bg-cyan-400/10 text-cyan-400 border-cyan-400/30">Testimonials</Badge>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Trusted by Travel Agencies</h2>
-            <p className="text-white/50">Hear from agencies already using Globex Connect</p>
+            <p className="text-white/50">Hear from agencies already using our platform</p>
           </div>
           <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
             {testimonials.map((t) => (
@@ -308,7 +310,7 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Modernize Your Travel Agency?</h2>
           <p className="text-white/50 max-w-xl mx-auto mb-8">
-            Join hundreds of travel agencies already using Globex Connect. Start free — no credit card required.
+            Join hundreds of travel agencies already using our platform. Start free — no credit card required.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/pricing">
