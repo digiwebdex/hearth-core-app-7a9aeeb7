@@ -11,7 +11,7 @@ async function main() {
   });
   const adminPass = await bcrypt.hash("admin123", 10);
   await prisma.user.create({
-    data: { name: "Super Admin", email: "admin@skyline.dev", password: adminPass, role: "super_admin", tenantId: adminTenant.id },
+    data: { name: "Super Admin", email: "admin@travelagencyweb.com", password: adminPass, role: "super_admin", tenantId: adminTenant.id },
   });
   await prisma.tenant.update({ where: { id: adminTenant.id }, data: { ownerId: adminTenant.id } });
 
