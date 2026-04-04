@@ -27,15 +27,32 @@ const MarketingLayout = ({ children, title, description }: Props) => {
 
   useEffect(() => {
     if (title) document.title = title;
+    const pageUrl = `https://${DOMAIN}${location.pathname === "/" ? "" : location.pathname}`;
+    const ogImage = `https://${DOMAIN}/images/og-share.png`;
     if (description) {
-      let meta = document.querySelector('meta[name="description"]');
-      if (!meta) { meta = document.createElement("meta"); meta.setAttribute("name", "description"); document.head.appendChild(meta); }
-      meta.setAttribute("content", description);
+      const setMeta = (sel: string, attr: string, val: string) => {
+        let el = document.querySelector(sel);
+        if (!el) { el = document.createElement("meta"); const a = sel.match(/\[(\w+)="([^"]+)"\]/); if (a) el.setAttribute(a[1], a[2]); document.head.appendChild(el); }
+        el.setAttribute(attr, val);
+      };
+      setMeta('meta[name="description"]', "content", description);
+      setMeta('meta[property="og:description"]', "content", description);
+      setMeta('meta[name="twitter:description"]', "content", description);
     }
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) {
-      canonical.setAttribute("href", `https://${DOMAIN}${location.pathname === "/" ? "" : location.pathname}`);
+    if (title) {
+      const setMeta = (sel: string, attr: string, val: string) => {
+        let el = document.querySelector(sel);
+        if (el) el.setAttribute(attr, val);
+      };
+      setMeta('meta[property="og:title"]', "content", title);
+      setMeta('meta[name="twitter:title"]', "content", title);
     }
+    // Update URL-based tags
+    const updateAttr = (sel: string, attr: string, val: string) => { const el = document.querySelector(sel); if (el) el.setAttribute(attr, val); };
+    updateAttr('link[rel="canonical"]', "href", pageUrl);
+    updateAttr('meta[property="og:url"]', "content", pageUrl);
+    updateAttr('meta[property="og:image"]', "content", ogImage);
+    updateAttr('meta[name="twitter:image"]', "content", ogImage);
     return () => { document.title = `${BRAND} — Complete Travel Agency Management`; };
   }, [title, description, location.pathname]);
 
