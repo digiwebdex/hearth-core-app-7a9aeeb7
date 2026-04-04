@@ -5,7 +5,7 @@
 # ══════════════════════════════════════════════════════════════
 
 echo "╔══════════════════════════════════════════════════════╗"
-echo "║   Skyline Travel SaaS — VPS Diagnostic Report       ║"
+echo "║   Hearth Core App — VPS Diagnostic Report         ║"
 echo "╚══════════════════════════════════════════════════════╝"
 echo ""
 echo "Date: $(date)"
