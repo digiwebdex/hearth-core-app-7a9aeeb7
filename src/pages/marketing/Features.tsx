@@ -118,8 +118,8 @@ const featureGroups = [
 const Features = () => {
   return (
     <MarketingLayout
-      title="Features — Globex Connect | Travel Agency Software"
-      description="Explore all features of Globex Connect — leads, quotations, bookings, invoices, vendor management, reports, and Hajj/Umrah module for travel agencies."
+      title="Features — Travel Agency Website & Software Solution"
+      description="Explore all features — leads, quotations, bookings, invoices, vendor management, reports, and Hajj/Umrah module for travel agencies."
     >
       {/* Hero */}
       <section className="relative overflow-hidden py-20 md:py-28">
