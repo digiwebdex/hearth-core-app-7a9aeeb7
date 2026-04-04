@@ -22,11 +22,31 @@ fi
 sudo systemctl enable postgresql
 sudo systemctl start postgresql
 
-# ── 2. Create database and user ──
-echo "═══ Step 2: Setting up database ═══"
+# ── 2. Pull latest from GitHub ──
+echo "═══ Step 2: Setting up project ═══"
+if [ ! -d "$FRONTEND_DIR/.git" ]; then
+  echo "ERROR: Git repo not found at $FRONTEND_DIR"
+  echo "Please clone your GitHub repo first:"
+  echo "  git clone https://github.com/digiwebdex/hearth-core-app.git $FRONTEND_DIR"
+  echo "Then run this script again."
+  exit 1
+fi
+
+cd "$FRONTEND_DIR"
+GIT_PULL_OUTPUT=$(git pull origin main)
+echo "$GIT_PULL_OUTPUT"
+if ! echo "$GIT_PULL_OUTPUT" | grep -q "Already up to date."; then
+  echo ""
+  echo "Repository was updated during setup. Re-run this script once so the latest setup steps are used."
+  exit 0
+fi
+
+DB_PORT=$(sudo -u postgres psql -tAc "SHOW port" | tr -d '[:space:]')
+DB_HOST="127.0.0.1"
 DB_PASSWORD=$(openssl rand -hex 16)
 
-# Create user or update password if user already exists
+# ── 3. Create database and user ──
+echo "═══ Step 3: Setting up database ═══"
 if sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='hearth'" | grep -q 1; then
   echo "User already exists — updating password"
   sudo -u postgres psql -c "ALTER USER hearth WITH PASSWORD '$DB_PASSWORD';"
@@ -37,37 +57,24 @@ fi
 sudo -u postgres psql -c "CREATE DATABASE hearth_db OWNER hearth;" 2>/dev/null || echo "Database already exists"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE hearth_db TO hearth;"
 
-# ── 3. Install Node.js 20 ──
-echo "═══ Step 3: Installing Node.js ═══"
+# ── 4. Install Node.js 20 ──
+echo "═══ Step 4: Installing Node.js ═══"
 if ! command -v node &> /dev/null; then
   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
   sudo apt-get install -y nodejs
 fi
 
-# ── 4. Install PM2 ──
+# ── 5. Install PM2 ──
 if ! command -v pm2 &> /dev/null; then
   sudo npm install -g pm2
 fi
-
-# ── 5. Pull latest from GitHub ──
-echo "═══ Step 5: Setting up project ═══"
-if [ ! -d "$FRONTEND_DIR/.git" ]; then
-  echo "ERROR: Git repo not found at $FRONTEND_DIR"
-  echo "Please clone your GitHub repo first:"
-  echo "  git clone https://github.com/digiwebdex/hearth-core-app.git $FRONTEND_DIR"
-  echo "Then run this script again."
-  exit 1
-fi
-
-cd "$FRONTEND_DIR"
-git pull origin main
 
 # ── 6. Setup backend .env ──
 echo "═══ Step 6: Configuring backend ═══"
 JWT_SECRET=$(openssl rand -hex 32)
 
 cat > "$BACKEND_DIR/.env" << ENVFILE
-DATABASE_URL="postgresql://hearth:${DB_PASSWORD}@localhost:5432/hearth_db"
+DATABASE_URL="postgresql://hearth:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/hearth_db"
 JWT_SECRET="${JWT_SECRET}"
 PORT=4000
 CORS_ORIGIN="https://travelagencyweb.com"
@@ -78,6 +85,7 @@ mkdir -p "$BACKEND_DIR/uploads"
 
 cd "$BACKEND_DIR"
 npm install
+PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U hearth -d hearth_db -c "SELECT current_database(), current_user;" >/dev/null
 npx prisma generate
 npx prisma db push
 node prisma/seed.js
