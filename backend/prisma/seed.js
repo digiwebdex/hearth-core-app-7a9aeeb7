@@ -7,7 +7,7 @@ async function main() {
 
   // Super admin tenant
   const adminTenant = await prisma.tenant.create({
-    data: { name: "Skyline Platform", subscriptionPlan: "enterprise", subscriptionStatus: "active" },
+    data: { name: "TAWSS Platform", subscriptionPlan: "enterprise", subscriptionStatus: "active" },
   });
   const adminPass = await bcrypt.hash("admin123", 10);
   await prisma.user.create({
