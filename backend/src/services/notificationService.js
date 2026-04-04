@@ -72,7 +72,7 @@ const EVENT_HANDLERS = {
       if (data.ownerEmail) {
         await sendEmail({
           to: data.ownerEmail,
-          subject: `${data.plan} Plan Activated — Skyline Travel`,
+          subject: `${data.plan} Plan Activated — Travel Agency Website & Software Solution`,
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
               <h2>Your ${data.plan} Plan is Active!</h2>

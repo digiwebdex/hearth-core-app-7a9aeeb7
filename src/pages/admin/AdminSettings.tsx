@@ -581,7 +581,7 @@ const AdminSettings = () => {
                   <div className="space-y-2">
                     <Label>Sender ID</Label>
                     <Input
-                      placeholder="e.g. GLOBEX"
+                      placeholder="e.g. TAWSS"
                       value={sms.senderId}
                       onChange={(e) => setSms({ ...sms, senderId: e.target.value })}
                     />
