@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { publicApi } from "@/lib/publicApi";
 
 const SiteContact = () => {
   const { tenant } = useWebsite();
