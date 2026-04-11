@@ -135,8 +135,11 @@ const MarketingLayout = ({ children, title, description }: Props) => {
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src={logoImg} alt={BRAND} className="h-8 w-auto" />
-                <span className="font-bold text-lg">{BRAND_SHORT}</span>
+                <img src={logoImg} alt={BRAND} className="h-10 w-10 object-contain" />
+                <div className="flex flex-col leading-tight">
+                  <span className="text-sm font-bold text-white tracking-wide">Travel Agency</span>
+                  <span className="text-[10px] text-white/50 tracking-wider uppercase">Website & Software Solution</span>
+                </div>
               </div>
               <p className="text-sm text-white/35 leading-relaxed">
                 {BRAND}. From inquiry to trip completion — manage leads, quotations, bookings, invoices, and vendors in one place.
