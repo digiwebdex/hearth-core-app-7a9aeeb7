@@ -41,17 +41,17 @@ const Demo = () => {
     >
       {/* Hero */}
       <section className="relative overflow-hidden py-16 md:py-24">
-        <div className="absolute inset-0 opacity-15" style={{
-          backgroundImage: "radial-gradient(circle at 30% 40%, #06b6d4, transparent 50%)",
+        <div className="absolute inset-0 opacity-12" style={{
+          backgroundImage: "radial-gradient(circle at 30% 40%, hsl(35, 92%, 50%), transparent 50%)",
         }} />
         <div className="container mx-auto px-4 text-center relative">
-          <Badge className="mb-6 bg-cyan-400/10 text-cyan-400 border-cyan-400/30 text-sm px-4 py-1.5">
+          <Badge className="mb-6 bg-amber-400/10 text-amber-400 border-amber-400/25 text-sm px-4 py-1.5">
             <Calendar className="mr-1.5 h-3.5 w-3.5 inline" />Free Personalized Demo
           </Badge>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
             See Our Platform in Action
           </h1>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto">
+          <p className="text-lg text-white/45 max-w-2xl mx-auto">
             Book a 30-minute walkthrough tailored to your agency's workflow. We'll show you exactly how to manage leads, quotations, bookings, and payments.
           </p>
         </div>
@@ -62,7 +62,7 @@ const Demo = () => {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* Form */}
-            <Card className="bg-white/5 border-white/10 text-white">
+            <Card className="bg-white/[0.04] border-white/8 text-white">
               <CardHeader>
                 <CardTitle className="text-xl">Request Your Demo</CardTitle>
               </CardHeader>
@@ -70,28 +70,28 @@ const Demo = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-white/70">Full Name *</Label>
-                      <Input value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your name" required className="bg-white/5 border-white/15 text-white placeholder:text-white/30" />
+                      <Label className="text-white/60">Full Name *</Label>
+                      <Input value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your name" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70">Company Name *</Label>
-                      <Input value={form.company} onChange={(e) => update("company", e.target.value)} placeholder="Your travel agency" required className="bg-white/5 border-white/15 text-white placeholder:text-white/30" />
+                      <Label className="text-white/60">Company Name *</Label>
+                      <Input value={form.company} onChange={(e) => update("company", e.target.value)} placeholder="Your travel agency" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" />
                     </div>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-white/70">Email *</Label>
-                      <Input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@agency.com" required className="bg-white/5 border-white/15 text-white placeholder:text-white/30" />
+                      <Label className="text-white/60">Email *</Label>
+                      <Input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@agency.com" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-white/70">Phone *</Label>
-                      <Input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+880 1XXX-XXXXXX" required className="bg-white/5 border-white/15 text-white placeholder:text-white/30" />
+                      <Label className="text-white/60">Phone *</Label>
+                      <Input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+880 1XXX-XXXXXX" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">Team Size</Label>
+                    <Label className="text-white/60">Team Size</Label>
                     <Select value={form.teamSize} onValueChange={(v) => update("teamSize", v)}>
-                      <SelectTrigger className="bg-white/5 border-white/15 text-white"><SelectValue placeholder="How many people?" /></SelectTrigger>
+                      <SelectTrigger className="bg-white/5 border-white/12 text-white"><SelectValue placeholder="How many people?" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="1-3">Just me / 1-3 people</SelectItem>
                         <SelectItem value="4-10">4-10 people</SelectItem>
@@ -101,10 +101,10 @@ const Demo = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-white/70">What would you like to see?</Label>
-                    <Textarea value={form.message} onChange={(e) => update("message", e.target.value)} placeholder="E.g. CRM, booking management, Hajj/Umrah module, invoicing..." rows={4} className="bg-white/5 border-white/15 text-white placeholder:text-white/30" />
+                    <Label className="text-white/60">What would you like to see?</Label>
+                    <Textarea value={form.message} onChange={(e) => update("message", e.target.value)} placeholder="E.g. CRM, booking management, Hajj/Umrah module, invoicing..." rows={4} className="bg-white/5 border-white/12 text-white placeholder:text-white/25" />
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white">
+                  <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20">
                     {loading ? "Submitting..." : "Request Demo"}
                   </Button>
                 </form>
@@ -123,26 +123,26 @@ const Demo = () => {
                     { icon: Clock, title: "30 Minutes, No Pressure", desc: "A quick, focused session. No long sales pitch — just a straightforward demo of how the platform works for agencies like yours." },
                   ].map((item) => (
                     <div key={item.title} className="flex gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-cyan-400/10 flex items-center justify-center shrink-0">
-                        <item.icon className="h-5 w-5 text-cyan-400" />
+                      <div className="w-10 h-10 rounded-xl bg-amber-400/10 flex items-center justify-center shrink-0">
+                        <item.icon className="h-5 w-5 text-amber-400" />
                       </div>
                       <div>
                         <h4 className="font-semibold mb-1">{item.title}</h4>
-                        <p className="text-sm text-white/50">{item.desc}</p>
+                        <p className="text-sm text-white/45">{item.desc}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
+              <div className="p-6 rounded-2xl bg-white/[0.04] border border-white/8">
                 <h4 className="font-semibold mb-3">Trusted by Travel Agencies</h4>
                 <div className="space-y-3">
                   {[
                     "\"The demo showed us exactly how to replace our spreadsheets. We signed up the same day.\" — Al-Amin Tours",
                     "\"They understood our Hajj business perfectly. The pilgrim management module was exactly what we needed.\" — Noor Umrah Services",
                   ].map((q, i) => (
-                    <p key={i} className="text-sm text-white/40 italic">{q}</p>
+                    <p key={i} className="text-sm text-white/35 italic">{q}</p>
                   ))}
                 </div>
               </div>
