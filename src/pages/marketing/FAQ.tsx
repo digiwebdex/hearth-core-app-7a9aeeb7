@@ -69,14 +69,14 @@ const FAQ = () => {
       {/* Hero */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
-          <Badge className="mb-6 bg-cyan-400/10 text-cyan-400 border-cyan-400/30 text-sm px-4 py-1.5">
+          <Badge className="mb-6 bg-amber-400/10 text-amber-400 border-amber-400/25 text-sm px-4 py-1.5">
             <HelpCircle className="mr-1.5 h-3.5 w-3.5 inline" />Help Center
           </Badge>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
             Frequently Asked Questions
           </h1>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto">
-            Everything you need to know about our platform. Can't find what you're looking for? <Link to="/contact-us" className="text-cyan-400 hover:underline">Contact our team</Link>.
+          <p className="text-lg text-white/45 max-w-2xl mx-auto">
+            Everything you need to know about our platform. Can't find what you're looking for? <Link to="/contact-us" className="text-amber-400 hover:underline">Contact our team</Link>.
           </p>
         </div>
       </section>
@@ -87,23 +87,23 @@ const FAQ = () => {
           <div className="space-y-10">
             {faqCategories.map((cat) => (
               <div key={cat.category}>
-                <h2 className="text-xl font-bold mb-4 text-cyan-400">{cat.category}</h2>
+                <h2 className="text-xl font-bold mb-4 text-amber-400">{cat.category}</h2>
                 <div className="space-y-2">
                   {cat.questions.map((item, i) => {
                     const key = `${cat.category}-${i}`;
                     const isOpen = openItems[key];
                     return (
-                      <div key={key} className="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+                      <div key={key} className="rounded-xl border border-white/8 bg-white/[0.02] overflow-hidden">
                         <button
                           onClick={() => toggle(key)}
-                          className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.02] transition-colors"
+                          className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.03] transition-colors"
                         >
                           <span className="font-medium text-sm pr-4">{item.q}</span>
-                          <ChevronDown className={`h-4 w-4 text-white/40 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                          <ChevronDown className={`h-4 w-4 text-white/35 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                         </button>
                         {isOpen && (
                           <div className="px-5 pb-4">
-                            <p className="text-sm text-white/50 leading-relaxed">{item.a}</p>
+                            <p className="text-sm text-white/45 leading-relaxed">{item.a}</p>
                           </div>
                         )}
                       </div>
@@ -117,21 +117,21 @@ const FAQ = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-[#0d1d35]">
+      <section className="py-16 bg-[#0f1729]">
         <div className="container mx-auto px-4 text-center">
-          <MessageCircle className="h-10 w-10 text-cyan-400 mx-auto mb-4" />
+          <MessageCircle className="h-10 w-10 text-amber-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-3">Still Have Questions?</h2>
-          <p className="text-white/50 max-w-md mx-auto mb-6">
+          <p className="text-white/45 max-w-md mx-auto mb-6">
             Our team is happy to help. Book a personalized demo or send us a message.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/demo">
-              <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8">
+              <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 shadow-lg shadow-amber-500/25">
                 Book a Demo
               </Button>
             </Link>
             <Link to="/contact-us">
-              <Button size="lg" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/5 px-8">
+              <Button size="lg" variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10 px-8">
                 Contact Support
               </Button>
             </Link>
