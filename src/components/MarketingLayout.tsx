@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, Mail, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/logo-icon.png";
 
 const navLinks = [
   { label: "Features", path: "/features" },
@@ -63,11 +63,12 @@ const MarketingLayout = ({ children, title, description }: Props) => {
       {/* Navbar */}
       <header className="sticky top-0 z-50 border-b border-white/8 bg-[#0c1222]/95 backdrop-blur-xl">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2.5">
-            <img src={logoImg} alt={BRAND} className="h-9 w-auto" />
-            <span className="text-lg font-bold tracking-wide hidden sm:inline">
-              <span className="text-white">{BRAND_SHORT}</span>
-            </span>
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logoImg} alt={BRAND} className="h-10 w-10 object-contain" />
+            <div className="hidden sm:flex flex-col leading-tight">
+              <span className="text-sm font-bold text-white tracking-wide">Travel Agency</span>
+              <span className="text-[10px] text-white/50 tracking-wider uppercase">Website & Software Solution</span>
+            </div>
           </Link>
 
           {/* Desktop */}
@@ -134,8 +135,11 @@ const MarketingLayout = ({ children, title, description }: Props) => {
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <img src={logoImg} alt={BRAND} className="h-8 w-auto" />
-                <span className="font-bold text-lg">{BRAND_SHORT}</span>
+                <img src={logoImg} alt={BRAND} className="h-10 w-10 object-contain" />
+                <div className="flex flex-col leading-tight">
+                  <span className="text-sm font-bold text-white tracking-wide">Travel Agency</span>
+                  <span className="text-[10px] text-white/50 tracking-wider uppercase">Website & Software Solution</span>
+                </div>
               </div>
               <p className="text-sm text-white/35 leading-relaxed">
                 {BRAND}. From inquiry to trip completion — manage leads, quotations, bookings, invoices, and vendors in one place.
