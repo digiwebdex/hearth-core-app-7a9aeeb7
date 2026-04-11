@@ -234,38 +234,55 @@ const Pricing = () => {
       </section>
 
       {/* Registration Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#111827] border-white/10 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-xl">
-              Subscribe to <span className="text-amber-400">{PLANS.find((p) => p.id === selectedPlan)?.name}</span> Plan
-            </DialogTitle>
-            <DialogDescription className="text-white/45">
-              Fill in your details to get started with a 14-day free trial.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-            <div className="p-3 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-between">
-              <span className="text-sm font-medium">{PLANS.find((p) => p.id === selectedPlan)?.name} Plan</span>
-              <span className="font-bold text-amber-400">
-                {(() => { const p = PLANS.find((p) => p.id === selectedPlan); return p?.monthlyPrice === -1 ? "Custom" : p?.monthlyPrice === 0 ? "Free" : `৳${getPrice(p!).toLocaleString()}/mo`; })()}
-              </span>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-white/60">Company Name *</Label><Input value={form.companyName} onChange={(e) => update("companyName", e.target.value)} placeholder="Your Travel Agency" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
-              <div className="space-y-2"><Label className="text-white/60">Your Name *</Label><Input value={form.ownerName} onChange={(e) => update("ownerName", e.target.value)} placeholder="Full name" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-white/60">Email *</Label><Input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@agency.com" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
-              <div className="space-y-2"><Label className="text-white/60">Phone *</Label><Input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+880 1XXX-XXXXXX" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
-            </div>
-            <div className="space-y-2"><Label className="text-white/60">Password *</Label><Input type="password" value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="Min 8 characters" required minLength={8} className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
-            <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20">
-              {loading ? "Creating Account..." : "Start 14-Day Free Trial"}
-            </Button>
-            <p className="text-center text-xs text-white/25">Already have an account? <Link to="/login" className="text-amber-400 underline">Sign in</Link></p>
-          </form>
-        </DialogContent>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) setSelectedPlan(null);
+        }}
+      >
+        {(() => {
+          const selectedPlanInfo = PLANS.find((p) => p.id === selectedPlan);
+          if (!selectedPlanInfo) return null;
+
+          return (
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#111827] border-white/10 text-white">
+              <DialogHeader>
+                <DialogTitle className="text-xl">
+                  Subscribe to <span className="text-amber-400">{selectedPlanInfo.name}</span> Plan
+                </DialogTitle>
+                <DialogDescription className="text-white/45">
+                  Fill in your details to get started with a 14-day free trial.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div className="p-3 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-between">
+                  <span className="text-sm font-medium">{selectedPlanInfo.name} Plan</span>
+                  <span className="font-bold text-amber-400">
+                    {selectedPlanInfo.monthlyPrice === -1
+                      ? "Custom"
+                      : selectedPlanInfo.monthlyPrice === 0
+                        ? "Free"
+                        : `৳${getPrice(selectedPlanInfo).toLocaleString()}/mo`}
+                  </span>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label className="text-white/60">Company Name *</Label><Input value={form.companyName} onChange={(e) => update("companyName", e.target.value)} placeholder="Your Travel Agency" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
+                  <div className="space-y-2"><Label className="text-white/60">Your Name *</Label><Input value={form.ownerName} onChange={(e) => update("ownerName", e.target.value)} placeholder="Full name" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label className="text-white/60">Email *</Label><Input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@agency.com" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
+                  <div className="space-y-2"><Label className="text-white/60">Phone *</Label><Input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+880 1XXX-XXXXXX" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
+                </div>
+                <div className="space-y-2"><Label className="text-white/60">Password *</Label><Input type="password" value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="Min 8 characters" required minLength={8} className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
+                <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20">
+                  {loading ? "Creating Account..." : "Start 14-Day Free Trial"}
+                </Button>
+                <p className="text-center text-xs text-white/25">Already have an account? <Link to="/login" className="text-amber-400 underline">Sign in</Link></p>
+              </form>
+            </DialogContent>
+          );
+        })()}
       </Dialog>
     </MarketingLayout>
   );
