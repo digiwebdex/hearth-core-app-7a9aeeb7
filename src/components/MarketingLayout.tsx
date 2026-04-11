@@ -48,7 +48,6 @@ const MarketingLayout = ({ children, title, description }: Props) => {
       setMeta('meta[property="og:title"]', "content", title);
       setMeta('meta[name="twitter:title"]', "content", title);
     }
-    // Update URL-based tags
     const updateAttr = (sel: string, attr: string, val: string) => { const el = document.querySelector(sel); if (el) el.setAttribute(attr, val); };
     updateAttr('link[rel="canonical"]', "href", pageUrl);
     updateAttr('meta[property="og:url"]', "content", pageUrl);
@@ -60,9 +59,9 @@ const MarketingLayout = ({ children, title, description }: Props) => {
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-[#0a1628] text-white">
+    <div className="min-h-screen bg-[#0c1222] text-white">
       {/* Navbar */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0a1628]/95 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-white/8 bg-[#0c1222]/95 backdrop-blur-xl">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2.5">
             <img src={logoImg} alt={BRAND} className="h-9 w-auto" />
@@ -78,19 +77,19 @@ const MarketingLayout = ({ children, title, description }: Props) => {
                 key={link.path}
                 to={link.path}
                 className={`transition-colors hover:text-white ${
-                  location.pathname === link.path ? "text-cyan-400 font-medium" : "text-white/60"
+                  location.pathname === link.path ? "text-amber-400 font-medium" : "text-white/55"
                 }`}
               >
                 {link.label}
               </Link>
             ))}
             <Link to="/demo">
-              <Button size="sm" variant="outline" className="border-cyan-400/40 text-cyan-400 hover:bg-cyan-400/10">
+              <Button size="sm" variant="outline" className="border-amber-400/30 text-amber-400 hover:bg-amber-400/10">
                 Book a Demo
               </Button>
             </Link>
             <Link to="/login">
-              <Button size="sm" className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white">
+              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20">
                 Login
               </Button>
             </Link>
@@ -104,23 +103,23 @@ const MarketingLayout = ({ children, title, description }: Props) => {
 
         {/* Mobile nav */}
         {menuOpen && (
-          <div className="md:hidden border-t border-white/10 bg-[#0a1628] px-4 pb-4">
+          <div className="md:hidden border-t border-white/8 bg-[#0c1222] px-4 pb-4">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={`block py-2.5 text-sm ${
-                  location.pathname === link.path ? "text-cyan-400 font-medium" : "text-white/60"
+                  location.pathname === link.path ? "text-amber-400 font-medium" : "text-white/55"
                 }`}
               >
                 {link.label}
               </Link>
             ))}
             <Link to="/demo" className="block py-2.5">
-              <Button size="sm" variant="outline" className="w-full border-cyan-400/40 text-cyan-400">Book a Demo</Button>
+              <Button size="sm" variant="outline" className="w-full border-amber-400/30 text-amber-400">Book a Demo</Button>
             </Link>
             <Link to="/login" className="block pt-1">
-              <Button size="sm" className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white">Login</Button>
+              <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white">Login</Button>
             </Link>
           </div>
         )}
@@ -130,7 +129,7 @@ const MarketingLayout = ({ children, title, description }: Props) => {
       <main>{children}</main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 pt-16 pb-8">
+      <footer className="border-t border-white/8 pt-16 pb-8 bg-[#080e1a]">
         <div className="container mx-auto px-4">
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div>
@@ -138,53 +137,53 @@ const MarketingLayout = ({ children, title, description }: Props) => {
                 <img src={logoImg} alt={BRAND} className="h-8 w-auto" />
                 <span className="font-bold text-lg">{BRAND_SHORT}</span>
               </div>
-              <p className="text-sm text-white/40 leading-relaxed">
+              <p className="text-sm text-white/35 leading-relaxed">
                 {BRAND}. From inquiry to trip completion — manage leads, quotations, bookings, invoices, and vendors in one place.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <div className="space-y-2.5 text-sm text-white/40">
-                <Link to="/features" className="block hover:text-white/70">Features</Link>
-                <Link to="/pricing" className="block hover:text-white/70">Pricing</Link>
-                <Link to="/demo" className="block hover:text-white/70">Book a Demo</Link>
-                <Link to="/faq" className="block hover:text-white/70">FAQ</Link>
+              <h4 className="font-semibold mb-4 text-white/90">Product</h4>
+              <div className="space-y-2.5 text-sm text-white/35">
+                <Link to="/features" className="block hover:text-white/60">Features</Link>
+                <Link to="/pricing" className="block hover:text-white/60">Pricing</Link>
+                <Link to="/demo" className="block hover:text-white/60">Book a Demo</Link>
+                <Link to="/faq" className="block hover:text-white/60">FAQ</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <div className="space-y-2.5 text-sm text-white/40">
-                <Link to="/contact-us" className="block hover:text-white/70">Contact Us</Link>
-                <Link to="/privacy" className="block hover:text-white/70">Privacy Policy</Link>
-                <Link to="/terms" className="block hover:text-white/70">Terms of Service</Link>
+              <h4 className="font-semibold mb-4 text-white/90">Company</h4>
+              <div className="space-y-2.5 text-sm text-white/35">
+                <Link to="/contact-us" className="block hover:text-white/60">Contact Us</Link>
+                <Link to="/privacy" className="block hover:text-white/60">Privacy Policy</Link>
+                <Link to="/terms" className="block hover:text-white/60">Terms of Service</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <div className="space-y-3 text-sm text-white/40">
+              <h4 className="font-semibold mb-4 text-white/90">Contact</h4>
+              <div className="space-y-3 text-sm text-white/35">
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-cyan-400/60" />
+                  <Phone className="h-4 w-4 text-amber-400/50" />
                   <span>+880 1234-567890</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-cyan-400/60" />
+                  <Mail className="h-4 w-4 text-amber-400/50" />
                   <span>support@travelagencyweb.com</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-cyan-400/60" />
+                  <MapPin className="h-4 w-4 text-amber-400/50" />
                   <span>Dhaka, Bangladesh</span>
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-white/30">
+          <div className="mt-12 pt-6 border-t border-white/8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-white/25">
               © {new Date().getFullYear()} {BRAND}. All rights reserved.
             </p>
-            <div className="flex gap-6 text-sm text-white/30">
-              <Link to="/privacy" className="hover:text-white/50">Privacy</Link>
-              <Link to="/terms" className="hover:text-white/50">Terms</Link>
-              <Link to="/contact-us" className="hover:text-white/50">Support</Link>
+            <div className="flex gap-6 text-sm text-white/25">
+              <Link to="/privacy" className="hover:text-white/45">Privacy</Link>
+              <Link to="/terms" className="hover:text-white/45">Terms</Link>
+              <Link to="/contact-us" className="hover:text-white/45">Support</Link>
             </div>
           </div>
         </div>
