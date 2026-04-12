@@ -14,13 +14,25 @@ async function main() {
   }
 
   const adminPass = await bcrypt.hash("admin123", 10);
-  let adminUser = await prisma.user.findUnique({ where: { email: "admin@travelagencyweb.com" } });
-  if (!adminUser) {
-    adminUser = await prisma.user.create({
-      data: { name: "Super Admin", email: "admin@travelagencyweb.com", password: adminPass, role: "super_admin", tenantId: adminTenant.id },
-    });
-    await prisma.tenant.update({ where: { id: adminTenant.id }, data: { ownerId: adminUser.id } });
-  }
+  const adminUser = await prisma.user.upsert({
+    where: { email: "admin@travelagencyweb.com" },
+    update: {
+      name: "Super Admin",
+      password: adminPass,
+      role: "super_admin",
+      tenantId: adminTenant.id,
+      resetToken: null,
+      resetTokenExpiry: null,
+    },
+    create: {
+      name: "Super Admin",
+      email: "admin@travelagencyweb.com",
+      password: adminPass,
+      role: "super_admin",
+      tenantId: adminTenant.id,
+    },
+  });
+  await prisma.tenant.update({ where: { id: adminTenant.id }, data: { ownerId: adminUser.id } });
 
   // Demo tenant
   let demoTenant = await prisma.tenant.findFirst({ where: { name: "Al-Safa Travel Agency" } });
@@ -31,13 +43,25 @@ async function main() {
   }
 
   const demoPass = await bcrypt.hash("demo123", 10);
-  let demoUser = await prisma.user.findUnique({ where: { email: "user@demo.com" } });
-  if (!demoUser) {
-    demoUser = await prisma.user.create({
-      data: { name: "Demo User", email: "user@demo.com", password: demoPass, role: "tenant_owner", tenantId: demoTenant.id },
-    });
-    await prisma.tenant.update({ where: { id: demoTenant.id }, data: { ownerId: demoUser.id } });
-  }
+  const demoUser = await prisma.user.upsert({
+    where: { email: "user@demo.com" },
+    update: {
+      name: "Demo User",
+      password: demoPass,
+      role: "tenant_owner",
+      tenantId: demoTenant.id,
+      resetToken: null,
+      resetTokenExpiry: null,
+    },
+    create: {
+      name: "Demo User",
+      email: "user@demo.com",
+      password: demoPass,
+      role: "tenant_owner",
+      tenantId: demoTenant.id,
+    },
+  });
+  await prisma.tenant.update({ where: { id: demoTenant.id }, data: { ownerId: demoUser.id } });
 
   // Demo clients
   const existingClient = await prisma.client.findFirst({ where: { email: "ahmed@example.com", tenantId: demoTenant.id } });
