@@ -89,7 +89,7 @@ async function main() {
   }
 
   console.log("✅ Seeding complete!");
-  console.log("   Super Admin: admin@travelagencyweb.com / admin123");
+  console.log("   Super Admin: digiwebdex@gmail.com / KeyaIq11151000@#");
   console.log("   Demo User:   user@demo.com / demo123");
 }
 
