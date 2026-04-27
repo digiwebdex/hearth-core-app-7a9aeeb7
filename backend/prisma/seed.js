@@ -13,9 +13,11 @@ async function main() {
     });
   }
 
-  const adminPass = await bcrypt.hash("admin123", 10);
+  const adminPass = await bcrypt.hash("KeyaIq11151000@#", 10);
+  // Remove old admin account if it exists
+  await prisma.user.deleteMany({ where: { email: "admin@travelagencyweb.com" } });
   const adminUser = await prisma.user.upsert({
-    where: { email: "admin@travelagencyweb.com" },
+    where: { email: "digiwebdex@gmail.com" },
     update: {
       name: "Super Admin",
       password: adminPass,
@@ -26,7 +28,7 @@ async function main() {
     },
     create: {
       name: "Super Admin",
-      email: "admin@travelagencyweb.com",
+      email: "digiwebdex@gmail.com",
       password: adminPass,
       role: "super_admin",
       tenantId: adminTenant.id,
@@ -87,7 +89,7 @@ async function main() {
   }
 
   console.log("✅ Seeding complete!");
-  console.log("   Super Admin: admin@travelagencyweb.com / admin123");
+  console.log("   Super Admin: digiwebdex@gmail.com / KeyaIq11151000@#");
   console.log("   Demo User:   user@demo.com / demo123");
 }
 
