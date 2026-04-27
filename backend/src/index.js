@@ -7,18 +7,29 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(",").map(s => s.trim())
-  : ["*"];
+const normalizeOrigin = (value) => value?.trim().replace(/\/$/, "");
+const defaultOrigins = [
+  "https://travelagencyweb.com",
+  "https://www.travelagencyweb.com",
+  "http://localhost:5173",
+];
+const allowedOrigins = (process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",")
+  : defaultOrigins
+).map(normalizeOrigin);
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+    const requestOrigin = normalizeOrigin(origin);
+    if (!requestOrigin || allowedOrigins.includes("*") || allowedOrigins.includes(requestOrigin)) {
       callback(null, true);
     } else {
       callback(null, false);
     }
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
