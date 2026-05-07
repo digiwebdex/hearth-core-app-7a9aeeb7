@@ -30,7 +30,7 @@ const Terms = () => (
 
           <section>
             <h2 className="text-lg font-bold text-white mb-2">4. Subscription & Billing</h2>
-            <p>The Platform offers multiple subscription plans with varying features and limits. Paid plans include a 14-day free trial. After the trial period, you will be billed according to your selected plan and billing cycle (monthly or yearly). Prices are in Bangladeshi Taka (BDT) unless otherwise stated.</p>
+            <p>The Platform offers multiple subscription plans with varying features and limits. You will be billed according to your selected plan and billing cycle (monthly or yearly). Prices are in Bangladeshi Taka (BDT) unless otherwise stated.</p>
             <p>You may upgrade or downgrade your plan at any time. Upgrades take effect immediately. Downgrades take effect at the end of the current billing cycle. Refunds are not provided for partial billing periods unless required by law.</p>
           </section>
 

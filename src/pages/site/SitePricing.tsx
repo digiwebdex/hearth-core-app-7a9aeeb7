@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PLANS, FEATURE_COMPARISON, type PlanConfig } from "@/lib/plans";
 import { Check, X, Crown, Sparkles, Plane } from "lucide-react";
 
-const visiblePlans = PLANS.filter((p) => p.id !== "enterprise");
+const visiblePlans = PLANS;
 
 function PlanCard({ plan }: { plan: PlanConfig }) {
   const isPopular = plan.badge === "Most Popular";
@@ -56,9 +56,9 @@ function PlanCard({ plan }: { plan: PlanConfig }) {
             </li>
           ))}
         </ul>
-        <Link to={plan.price === 0 ? "/register" : `/register?plan=${plan.id}`} className="w-full">
+        <Link to={plan.price === -1 ? "/site/contact" : `/register?plan=${plan.id}`} className="w-full">
           <Button className="w-full" variant={highlighted ? "default" : "outline"} size="lg">
-            {plan.price === 0 ? "Get Started Free" : plan.price === -1 ? "Contact Sales" : "Subscribe Now"}
+            {plan.price === -1 ? "Contact Us for Price" : "Subscribe Now"}
           </Button>
         </Link>
       </CardContent>
@@ -67,8 +67,8 @@ function PlanCard({ plan }: { plan: PlanConfig }) {
 }
 
 function FeatureComparisonTable() {
-  const plans: Array<"free" | "basic" | "pro" | "business"> = ["free", "basic", "pro", "business"];
-  const planLabels = { free: "Free", basic: "Basic", pro: "Pro", business: "Business" };
+  const plans: Array<"basic" | "pro" | "business" | "enterprise"> = ["basic", "pro", "business", "enterprise"];
+  const planLabels = { basic: "Basic", pro: "Pro", business: "Business", enterprise: "Unlimited" };
 
   const renderCell = (val: boolean | string) => {
     if (val === true) return <Check className="h-4 w-4 text-primary mx-auto" />;
