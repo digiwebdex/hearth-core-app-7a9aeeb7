@@ -98,7 +98,7 @@ export const PLANS: PlanConfig[] = [
     maxClients: -1, maxBookings: -1, maxUsers: -1, maxDomains: -1,
     maxBranches: -1, maxSmsPerMonth: -1, maxStorageMB: -1, maxReports: -1,
     maxLeads: -1, maxQuotations: -1,
-    features: ["Unlimited clients", "Unlimited bookings", "Accounting", "All features unlocked", "Full automation", "Custom integrations", "Dedicated manager", "Priority 24/7 support"],
+    features: ["Unlimited clients", "Unlimited bookings", "Hajj, Umrah, Visa, Air Ticket, Hotel bookings", "Accounting", "All features unlocked", "Full automation", "Custom integrations", "Dedicated manager", "Priority 24/7 support"],
     restrictions: [],
     paymentGateways: ["manual", "sslcommerz", "bkash", "custom"],
     hasCustomDomain: true, hasWebsiteTemplates: true, hasSmsIntegration: true,
