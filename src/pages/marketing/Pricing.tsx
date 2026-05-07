@@ -58,19 +58,19 @@ const Pricing = () => {
   return (
     <MarketingLayout
       title="Pricing — Travel Agency Website & Software Solution"
-      description="Simple, transparent pricing for travel agencies. Start free and upgrade as your team grows. All plans include a 14-day free trial."
+      description="Simple, transparent pricing for travel agencies. Choose Basic, Pro, Business, or Unlimited."
     >
       {/* Hero */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
           <Badge className="mb-6 bg-amber-400/10 text-amber-400 border-amber-400/25 text-sm px-4 py-1.5">
-            14-Day Free Trial on All Paid Plans
+            Simple Pricing — No Hidden Fees
           </Badge>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
             Simple, Transparent Pricing
           </h1>
           <p className="text-lg text-white/45 max-w-2xl mx-auto mb-8">
-            Choose the plan that fits your travel agency. Start free and upgrade as your team and business grows. All prices in BDT.
+            Choose the plan that fits your travel agency. All prices in BDT.
           </p>
           {/* Billing toggle */}
           <div className="inline-flex items-center gap-3 p-1.5 rounded-full bg-white/5 border border-white/8">
@@ -87,7 +87,7 @@ const Pricing = () => {
       {/* Plan Cards */}
       <section className="pb-16">
         <div className="container mx-auto px-4">
-          <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5 max-w-7xl mx-auto">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
             {PLANS.map((plan) => {
               const Icon = planIcons[plan.id] || Star;
               const isHighlighted = plan.badge === "Most Popular" || plan.badge === "Best Value";
@@ -135,7 +135,7 @@ const Pricing = () => {
                       </ul>
                     )}
                     <Button className={`w-full h-10 text-sm ${isHighlighted ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20" : "bg-white/8 hover:bg-white/12 text-white"}`} onClick={() => handleSelectPlan(plan.id)}>
-                      {price === -1 ? "Contact Us" : price === 0 ? "Start Free" : "Start Trial"}<ArrowRight className="ml-2 h-4 w-4" />
+                      {price === -1 ? "Contact Us for Price" : "Subscribe Now"}<ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -194,12 +194,12 @@ const Pricing = () => {
                 {FEATURE_COMPARISON.map((cat) => (
                   <>
                     <TableRow key={cat.category} className="border-white/8 bg-white/[0.02]">
-                      <TableCell colSpan={6} className="font-semibold text-amber-400 text-sm py-2">{cat.category}</TableCell>
+                      <TableCell colSpan={5} className="font-semibold text-amber-400 text-sm py-2">{cat.category}</TableCell>
                     </TableRow>
                     {cat.features.map((feat) => (
                       <TableRow key={feat.name} className="border-white/8 hover:bg-white/[0.04]">
                         <TableCell className="text-sm text-white/60">{feat.name}</TableCell>
-                        {(["free", "basic", "pro", "business", "enterprise"] as const).map((planId) => {
+                        {(["basic", "pro", "business", "enterprise"] as const).map((planId) => {
                           const val = feat[planId];
                           return (
                             <TableCell key={planId} className="text-center">
@@ -252,7 +252,7 @@ const Pricing = () => {
                   Subscribe to <span className="text-amber-400">{selectedPlanInfo.name}</span> Plan
                 </DialogTitle>
                 <DialogDescription className="text-white/45">
-                  Fill in your details to get started with a 14-day free trial.
+                  Fill in your details to get started.
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -276,7 +276,7 @@ const Pricing = () => {
                 </div>
                 <div className="space-y-2"><Label className="text-white/60">Password *</Label><Input type="password" value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="Min 8 characters" required minLength={8} className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
                 <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20">
-                  {loading ? "Creating Account..." : "Start 14-Day Free Trial"}
+                  {loading ? "Creating Account..." : "Create Account"}
                 </Button>
                 <p className="text-center text-xs text-white/25">Already have an account? <Link to="/login" className="text-amber-400 underline">Sign in</Link></p>
               </form>
