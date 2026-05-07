@@ -47,7 +47,7 @@ export const DEFAULT_FEATURE_MAP: FeaturePlanMap = {
   bkash:                { free: false, basic: false, pro: false, business: true,  enterprise: true },
   custom_gateway:       { free: false, basic: false, pro: false, business: false, enterprise: true },
   refund_system:        { free: false, basic: false, pro: false, business: true,  enterprise: true },
-  email_notifications:  { free: false, basic: true,  pro: true,  business: true,  enterprise: true },
+  email_notifications:  { free: false, basic: false, pro: true,  business: true,  enterprise: true },
   sms_integration:      { free: false, basic: false, pro: true,  business: true,  enterprise: true },
   whatsapp:             { free: false, basic: false, pro: false, business: true,  enterprise: true },
   marketing_tools:      { free: false, basic: false, pro: false, business: true,  enterprise: true },
