@@ -57,6 +57,12 @@ const MarketingLayout = ({ children, title, description }: Props) => {
     return () => { document.title = `${BRAND} — Complete Travel Agency Management`; };
   }, [title, description, location.pathname]);
 
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
   return (
