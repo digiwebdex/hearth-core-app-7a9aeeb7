@@ -84,7 +84,7 @@ export const PLANS: PlanConfig[] = [
     maxClients: 2000, maxBookings: 2000, maxUsers: 25, maxDomains: 2,
     maxBranches: 5, maxSmsPerMonth: 2000, maxStorageMB: 10240, maxReports: -1,
     maxLeads: 2000, maxQuotations: 2000,
-    features: ["2,000 clients", "2,000 bookings", "Company domain (domain charge excluded)", "Website design", "SMS & Email integration", "Accounting", "Invoice + payments", "25 team members"],
+    features: ["2,000 clients", "2,000 bookings", "Hajj, Umrah, Visa, Air Ticket, Hotel bookings", "Company domain (domain charge excluded)", "Website design", "SMS & Email integration", "Accounting", "Invoice + payments", "25 team members"],
     restrictions: [],
     paymentGateways: ["manual", "sslcommerz", "bkash"],
     hasCustomDomain: true, hasWebsiteTemplates: true, hasSmsIntegration: true,
