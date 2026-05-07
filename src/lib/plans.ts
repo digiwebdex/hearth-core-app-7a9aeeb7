@@ -231,7 +231,7 @@ export const FEATURE_COMPARISON = [
     { name: "Storage", basic: "500 MB", pro: "2 GB", business: "10 GB", enterprise: "Unlimited" },
   ]},
   { category: "Advanced", features: [
-    { name: "Hajj & Umrah", basic: false, pro: true, business: true, enterprise: true },
+    { name: "Hajj, Umrah, Visa, Air Ticket, Hotel", basic: true, pro: true, business: true, enterprise: true },
     { name: "Advanced Analytics", basic: false, pro: false, business: true, enterprise: true },
     { name: "Full Automation", basic: false, pro: false, business: false, enterprise: true },
     { name: "API Access", basic: false, pro: false, business: false, enterprise: true },
