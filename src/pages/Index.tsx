@@ -74,7 +74,7 @@ const Index = () => {
 
   const update = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
-  const visiblePlans = PLANS.filter((p) => p.id !== "enterprise");
+  const visiblePlans = PLANS;
 
   return (
     <MarketingLayout
