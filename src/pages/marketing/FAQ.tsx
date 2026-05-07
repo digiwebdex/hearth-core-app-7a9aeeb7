@@ -20,10 +20,9 @@ const faqCategories = [
   {
     category: "Pricing & Plans",
     questions: [
-      { q: "Is there a free plan?", a: "Yes. The Free plan includes up to 50 clients, 50 bookings per month, basic invoicing, and a subdomain website. It's a great way to get started without any commitment." },
-      { q: "What's included in the 14-day free trial?", a: "All paid plans come with a 14-day free trial. You get full access to every feature in your chosen plan — no credit card required. If you don't upgrade after the trial, you'll be moved to the Free plan." },
+      { q: "What plans are available?", a: "Four plans: Basic (৳500/mo, 500 clients & bookings), Pro (৳800/mo, 1,000 clients & bookings + website + SMS/Email), Business (৳1,500/mo, 2,000 clients & bookings + advanced features), and Unlimited (custom pricing, all features + full automation)." },
       { q: "Can I upgrade or downgrade my plan later?", a: "Absolutely. You can upgrade at any time and the change takes effect immediately. Downgrading is also possible at the end of your billing cycle. Your data is always preserved." },
-      { q: "What payment methods do you accept?", a: "We accept bank transfer, bKash, and SSLCommerz for subscription payments. For Enterprise plans, we can arrange custom billing." },
+      { q: "What payment methods do you accept?", a: "We accept bank transfer, bKash, and SSLCommerz for subscription payments. For Unlimited plans, we can arrange custom billing." },
     ],
   },
   {

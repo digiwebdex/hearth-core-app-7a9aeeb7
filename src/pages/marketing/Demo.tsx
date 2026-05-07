@@ -119,7 +119,7 @@ const Demo = () => {
                   {[
                     { icon: Monitor, title: "Live Product Walkthrough", desc: "See every feature in action — from lead capture to invoice generation. We'll tailor the demo to your business type." },
                     { icon: Users, title: "Q&A With Our Team", desc: "Ask anything about setup, migration, pricing, or specific travel workflows. Our team has deep travel industry experience." },
-                    { icon: Zap, title: "Get Started Same Day", desc: "After the demo, you can start your 14-day free trial immediately. We'll help you import existing data if needed." },
+                    { icon: Zap, title: "Get Started Same Day", desc: "After the demo, we'll help you pick a plan, set up your account, and import existing data if needed." },
                     { icon: Clock, title: "30 Minutes, No Pressure", desc: "A quick, focused session. No long sales pitch — just a straightforward demo of how the platform works for agencies like yours." },
                   ].map((item) => (
                     <div key={item.title} className="flex gap-4">

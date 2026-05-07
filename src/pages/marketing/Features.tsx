@@ -221,7 +221,7 @@ const Features = () => {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/pricing">
               <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 h-12 shadow-lg shadow-amber-500/25">
-                Start Free Trial
+                View Pricing
               </Button>
             </Link>
             <Link to="/demo">
