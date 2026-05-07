@@ -25,6 +25,7 @@ const PUBLISHED_DOMAIN = "travelagencyweb.com";
 const MarketingLayout = ({ children, title, description }: Props) => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     if (title) document.title = title;
