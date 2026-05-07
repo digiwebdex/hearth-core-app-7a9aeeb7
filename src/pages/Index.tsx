@@ -42,9 +42,9 @@ const testimonials = [
 
 const faqItems = [
   { q: "Who is this platform for?", a: "It's built for travel agencies, tour operators, ticketing offices, and Hajj/Umrah service providers in Bangladesh and beyond." },
-  { q: "Is there a free plan?", a: "Yes — start with up to 50 clients and 50 bookings for free. Upgrade when you're ready." },
+  { q: "What plans do you offer?", a: "Four simple plans — Basic (৳500/mo), Pro (৳800/mo), Business (৳1,500/mo), and Unlimited (custom pricing). Pick what fits your team." },
   { q: "Do I need technical skills?", a: "No. If you can use WhatsApp, you can use our platform. No coding or IT team required." },
-  { q: "Can I try paid features before committing?", a: "All paid plans include a 14-day free trial with full feature access. No credit card needed." },
+  { q: "Can I change my plan later?", a: "Yes — upgrade or downgrade anytime from your dashboard. Pricing is prorated." },
 ];
 
 const Index = () => {
@@ -100,7 +100,7 @@ const Index = () => {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/pricing">
               <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 h-12 text-base shadow-lg shadow-amber-500/25">
-                <Zap className="mr-2 h-5 w-5" />Start Free Trial
+                <Zap className="mr-2 h-5 w-5" />View Pricing
               </Button>
             </Link>
             <Link to="/demo">
@@ -197,7 +197,7 @@ const Index = () => {
             <Badge className="mb-4 bg-amber-400/10 text-amber-400 border-amber-400/25">Pricing</Badge>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Plans for Every Agency Size</h2>
             <p className="text-white/45 max-w-2xl mx-auto">
-              Start free. Upgrade when you need more power. 14-day trial on all paid plans.
+              Pick the plan that fits your team. Upgrade or downgrade anytime.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
@@ -218,8 +218,8 @@ const Index = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="text-center">
-                      {plan.price === 0 ? (
-                        <span className="text-3xl font-extrabold text-amber-400">Free</span>
+                      {plan.price === -1 ? (
+                        <span className="text-2xl font-extrabold text-amber-400">Contact Us</span>
                       ) : (
                         <>
                           <span className="text-3xl font-extrabold text-amber-400">৳{plan.price.toLocaleString()}</span>
@@ -234,7 +234,7 @@ const Index = () => {
                       ))}
                     </ul>
                     <Button className={`w-full h-10 text-sm ${isHighlighted ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20" : "bg-white/8 hover:bg-white/12 text-white"}`} onClick={() => handleSelectPlan(plan.id)}>
-                      {plan.price === 0 ? "Start Free" : "Start Trial"}<ArrowRight className="ml-2 h-4 w-4" />
+                      {plan.price === -1 ? "Contact Us for Price" : "Subscribe Now"}<ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -310,12 +310,12 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Modernize Your Travel Agency?</h2>
           <p className="text-white/45 max-w-xl mx-auto mb-8">
-            Join hundreds of travel agencies already using our platform. Start free — no credit card required.
+            Join hundreds of travel agencies already using our platform.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/pricing">
               <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 h-12 text-base shadow-lg shadow-amber-500/25">
-                Start Free Trial
+                View Pricing
               </Button>
             </Link>
             <Link to="/demo">
@@ -343,12 +343,12 @@ const Index = () => {
             <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto bg-[#111827] border-white/10 text-white">
               <DialogHeader>
                 <DialogTitle className="text-xl">Subscribe to <span className="text-amber-400">{selectedPlanInfo.name}</span> Plan</DialogTitle>
-                <DialogDescription className="text-white/45">Fill in your company details to get started with a 14-day free trial.</DialogDescription>
+                <DialogDescription className="text-white/45">Fill in your company details to get started.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                 <div className="p-3 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-between">
                   <span className="text-sm font-medium">{selectedPlanInfo.name} Plan</span>
-                  <span className="font-bold text-amber-400">{selectedPlanInfo.price === -1 ? "Custom Pricing" : selectedPlanInfo.price === 0 ? "Free" : `৳${selectedPlanInfo.price.toLocaleString()}/mo`}</span>
+                  <span className="font-bold text-amber-400">{selectedPlanInfo.price === -1 ? "Contact Us for Price" : `৳${selectedPlanInfo.price.toLocaleString()}/mo`}</span>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2"><Label className="text-white/60">Company Name *</Label><Input value={form.companyName} onChange={(e) => update("companyName", e.target.value)} placeholder="Your Travel Agency" required className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
@@ -360,7 +360,7 @@ const Index = () => {
                 </div>
                 <div className="space-y-2"><Label className="text-white/60">Password *</Label><Input type="password" value={form.password} onChange={(e) => update("password", e.target.value)} placeholder="Min 8 characters" required minLength={8} className="bg-white/5 border-white/12 text-white placeholder:text-white/25" /></div>
                 <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20">
-                  {loading ? "Creating Account..." : "Start 14-Day Free Trial"}
+                  {loading ? "Creating Account..." : "Create Account"}
                 </Button>
                 <p className="text-center text-xs text-white/25">Already have an account? <Link to="/login" className="text-amber-400 underline">Sign in</Link></p>
               </form>
