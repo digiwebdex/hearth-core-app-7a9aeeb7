@@ -109,6 +109,7 @@ export const PLANS: PlanConfig[] = [
 ];
 
 export function getPlan(planId: PlanType): PlanConfig {
+  // "free" is deprecated; fall back to Basic for legacy tenants.
   return PLANS.find((p) => p.id === planId) || PLANS[0];
 }
 
