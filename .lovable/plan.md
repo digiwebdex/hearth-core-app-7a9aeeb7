@@ -1,78 +1,47 @@
+## Subdomain Architecture + Minimal Customer/Supplier Portal
 
+Set up reserved subdomains and build a minimal portal with magic-link login.
 
-## Production Verification Plan — Critical & High Priority
+### 1. Subdomain routing (`src/lib/domainResolver.ts`)
+- Add `RESERVED_SUBDOMAINS = ['app', 'portal', 'api', 'www', 'admin']`
+- Extend `DomainResolution.type` with `"portal"` and `"app"`
+- In `resolveHostname()`: if subdomain is `app` → main agency app; if `portal` → portal; reserved subdomains never treated as agency slug
 
-Based on codebase inspection, here are the findings and fixes needed.
+### 2. Routing (`src/App.tsx`)
+- Detect `portal.*` hostname → mount `<PortalApp />` (separate route tree)
+- Detect `app.*` hostname → existing agency/admin routes
+- Root domain → marketing site
 
----
+### 3. Portal frontend (new files)
+- `src/portal/PortalApp.tsx` — route tree
+- `src/portal/pages/PortalLogin.tsx` — email input → request magic link
+- `src/portal/pages/PortalVerify.tsx` — consumes `?token=...` → sets session
+- `src/portal/pages/MyBookings.tsx` — customer bookings list
+- `src/portal/pages/MyPurchaseOrders.tsx` — supplier POs list
+- `src/portal/PortalLayout.tsx` — minimal nav (Bookings / POs / Logout)
+- `src/lib/portalApi.ts` — calls to `/api/portal/*`
 
-### CRITICAL BLOCKERS
+### 4. Backend (Node/Express + Prisma)
+- `backend/src/routes/portal.js`:
+  - `POST /portal/auth/request-link` — issue signed token, email it
+  - `POST /portal/auth/verify` — exchange token for JWT (audience: `portal`)
+  - `GET /portal/bookings` — bookings where `client.email = user.email`
+  - `GET /portal/purchase-orders` — POs where `vendor.email = user.email`
+- `backend/src/middleware/portalAuth.js` — verify portal JWT
+- Reuse existing email service for magic link delivery
 
-#### 1. OG Image Dimension Mismatch
-- **Status: FAIL**
-- **Finding**: `og-share-v2.png` is **1376x768** but `index.html` declares `og:image:width=1200` and `og:image:height=630`
-- **Root cause**: Image was generated at wrong dimensions
-- **Files to fix**: `public/images/og-share-v2.png` (regenerate at exactly 1200x630), verify `index.html` meta tags match
-- **Impact**: Facebook/LinkedIn may crop or reject the image; Twitter may show incorrectly
+### 5. Infrastructure (docs only — no code change required immediately)
+- DNS: A records for `app`, `portal`, `api` → VPS IP
+- Nginx server blocks for each subdomain → same Vite build (frontend distinguishes by hostname); `api.*` → Node backend on port 4000
+- `.env.example`: add `VITE_APP_DOMAIN=travelagencyweb.com`
 
-#### 2. Old Brand References Still Present (4 files)
-- **Status: FAIL**
-- **Finding**: "Skyline" and "GLOBEX" still appear in:
-  - `backend/src/services/notificationService.js` line 75: `"Skyline Travel"` in email subject
-  - `src/components/SmtpSettings.tsx` line 100: placeholder `"Skyline Travel"`
-  - `src/pages/admin/AdminSettings.tsx` line 324: placeholder `"GLOBEX Travel"`
-  - `src/pages/admin/AdminSettings.tsx` line 584: placeholder `"GLOBEX"`
-  - `src/pages/admin/AdminDomains.tsx` line 219: path `/var/www/skyline-frontend/dist`
-- **Root cause**: Incomplete find-and-replace during branding pass
-- **Files to fix**: All 4 files above
+### Technical notes
+- Portal uses a **separate JWT audience** (`portal`) so portal tokens cannot access agency endpoints
+- Client/Vendor lookup is by email match — no separate `portal_users` table needed initially
+- Magic link token: signed JWT, 15-min expiry, single-use (track jti in memory or DB)
+- Portal session JWT: 7-day expiry, stored in localStorage under `portal_token`
 
-#### 3. Stale Asset: `public/images/og-image.jpg`
-- **Status: FAIL**
-- **Finding**: Old `og-image.jpg` exists in `public/images/` but is referenced nowhere — dead asset that could cause confusion
-- **Fix**: Delete `public/images/og-image.jpg`
-
----
-
-### HIGH PRIORITY CHECKS
-
-#### 4. SEO Metadata Consistency
-- **Status: PASS**
-- `index.html`: canonical, og:url → `travelagencyweb.com` ✓
-- `sitemap.xml`: all URLs → `travelagencyweb.com` ✓
-- `robots.txt`: sitemap → `travelagencyweb.com` ✓
-- JSON-LD: brand name, URL, offers all correct ✓
-
-#### 5. MarketingLayout Dynamic Meta Tags
-- **Status: PASS**
-- `PUBLISHED_DOMAIN` set to `hearth-core-app.lovable.app` for OG image reachability ✓
-- Dynamic updates for og:title, og:description, og:url, og:image, twitter:*, canonical ✓
-- All 8 marketing pages pass title/description props ✓
-
-#### 6. Social Crawler Reachability
-- **Status: PASS (with caveat)**
-- OG image URL points to `hearth-core-app.lovable.app` which is publicly reachable ✓
-- **Caveat**: Once `travelagencyweb.com` DNS is live, update `PUBLISHED_DOMAIN` in MarketingLayout.tsx and all `index.html` image URLs
-
-#### 7. Frontend Route Coverage
-- **Status: PASS**
-- All marketing pages (`/`, `/features`, `/pricing`, `/demo`, `/contact-us`, `/faq`, `/privacy`, `/terms`) routed in App.tsx ✓
-- Auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`) routed ✓
-
----
-
-### FIXES TO IMPLEMENT (3 items)
-
-| # | Fix | Files |
-|---|-----|-------|
-| 1 | Regenerate `og-share-v2.png` at exactly 1200x630 | `public/images/og-share-v2.png` |
-| 2 | Replace old brand placeholders in 4 files | `notificationService.js`, `SmtpSettings.tsx`, `AdminSettings.tsx`, `AdminDomains.tsx` |
-| 3 | Delete stale `public/images/og-image.jpg` | Delete file |
-
-### POST-FIX BROWSER TESTING
-
-After fixes, manually verify:
-1. Homepage loads with correct logo and brand name in navbar/footer
-2. Share preview: publish app, paste URL into [Facebook Debugger](https://developers.facebook.com/tools/debug/) — confirm 1200x630 image renders
-3. Navigate to `/pricing`, `/features`, `/faq` — confirm no old brand names visible
-4. Check admin settings page — confirm placeholder text shows new brand
-
+### Out of scope (future)
+- Online payment from portal
+- Document uploads from supplier
+- Multi-agency portal accounts (currently one email = one agency context, picked from latest booking)

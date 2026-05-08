@@ -11,6 +11,8 @@ const normalizeOrigin = (value) => value?.trim().replace(/\/$/, "");
 const defaultOrigins = [
   "https://travelagencyweb.com",
   "https://www.travelagencyweb.com",
+  "https://app.travelagencyweb.com",
+  "https://portal.travelagencyweb.com",
   "http://localhost:5173",
 ];
 const allowedOrigins = (process.env.CORS_ORIGIN
@@ -63,6 +65,9 @@ app.use("/api/admin/domains", require("./routes/domains"));
 // Public form routes (no auth)
 app.use("/api/contact", require("./routes/contact"));
 app.use("/api/demo-requests", require("./routes/demo"));
+
+// Customer / Supplier portal (separate JWT audience)
+app.use("/api/portal", require("./routes/portal"));
 
 // Email routes (authenticated)
 app.use("/api/email", require("./routes/email"));
