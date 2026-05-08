@@ -118,7 +118,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Plan Distribution</CardTitle>
-              <CardDescription>Tenants by subscription plan</CardDescription>
+              <CardDescription>Agencies by subscription plan</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
