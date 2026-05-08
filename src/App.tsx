@@ -8,6 +8,8 @@ import { WebsiteProvider } from "@/contexts/WebsiteContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminRoute from "@/components/AdminRoute";
 import Login from "./pages/Login";
+import { Navigate } from "react-router-dom";
+import { getReservedSubdomain } from "@/lib/domainResolver";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -87,7 +89,7 @@ const AppContent = () => (
         <Sonner />
         <Routes>
           {/* Main landing page */}
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={getReservedSubdomain(window.location.hostname) === "app" ? <Navigate to="/login" replace /> : <Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
