@@ -96,11 +96,6 @@ const MarketingLayout = ({ children, title, description }: Props) => {
                 Book a Demo
               </Button>
             </Link>
-            <Link to="/login">
-              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/20">
-                Login
-              </Button>
-            </Link>
           </nav>
 
           {/* Mobile toggle */}
@@ -125,9 +120,6 @@ const MarketingLayout = ({ children, title, description }: Props) => {
             ))}
             <Link to="/demo" className="block py-2.5">
               <Button size="sm" variant="outline" className="w-full border-amber-400/30 text-amber-400">Book a Demo</Button>
-            </Link>
-            <Link to="/login" className="block pt-1">
-              <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white">Login</Button>
             </Link>
           </div>
         )}
