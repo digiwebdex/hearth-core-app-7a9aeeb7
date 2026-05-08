@@ -73,7 +73,7 @@ const AdminDashboard = () => {
 
   const statCards = [
     { title: "Total Revenue", value: stats ? `৳${stats.totalRevenue.toLocaleString()}` : "—", icon: DollarSign },
-    { title: "Total Tenants", value: stats?.totalTenants ?? tenants.length, icon: Building2 },
+    { title: "Total Agencies", value: stats?.totalTenants ?? tenants.length, icon: Building2 },
     { title: "Active Subscriptions", value: statusDistribution.active, icon: Crown },
     { title: "Pending Payments", value: pendingPayments, icon: CreditCard },
     { title: "Total Users", value: stats?.totalUsers ?? "—", icon: Users },
