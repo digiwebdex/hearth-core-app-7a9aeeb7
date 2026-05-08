@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { adminApi, type AdminTenant } from "@/lib/api";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,18 +38,50 @@ const getStatusMeta = (s: SubscriptionStatus) => STATUS_META.find((x) => x.value
 
 const planOrder: PlanType[] = ["free", "basic", "pro", "business", "enterprise"];
 
-const mockSubscriptions: TenantSubscription[] = [
-  { id: "s1", tenantId: "t1", tenantName: "Acme Travel", ownerEmail: "john@acme.com", plan: "pro", billingCycle: "monthly", price: 1500, startDate: "2026-03-01", endDate: "2026-04-01", status: "active", autoRenew: true, usedClients: 180, usedBookings: 320, usedUsers: 12, usedSms: 380, usedStorageMB: 1200, usedBranches: 2, usedLeads: 200, usedQuotations: 85 },
-  { id: "s2", tenantId: "t2", tenantName: "Globe Tours", ownerEmail: "jane@globe.com", plan: "basic", billingCycle: "monthly", price: 800, startDate: "2026-02-15", endDate: "2026-03-15", status: "expired", autoRenew: false, usedClients: 45, usedBookings: 90, usedUsers: 4, usedSms: 20, usedStorageMB: 150, usedBranches: 1, usedLeads: 30, usedQuotations: 12 },
-  { id: "s3", tenantId: "t3", tenantName: "Star Holidays", ownerEmail: "ali@star.com", plan: "free", billingCycle: "monthly", price: 0, startDate: "2026-01-01", endDate: "", status: "active", autoRenew: false, usedClients: 48, usedBookings: 42, usedUsers: 1, usedSms: 0, usedStorageMB: 85, usedBranches: 1, usedLeads: 45, usedQuotations: 18 },
-  { id: "s4", tenantId: "t4", tenantName: "Royal Travels", ownerEmail: "royal@travel.com", plan: "business", billingCycle: "yearly", price: 28800, startDate: "2026-03-10", endDate: "2027-03-10", status: "active", autoRenew: true, usedClients: 500, usedBookings: 1200, usedUsers: 35, usedSms: 800, usedStorageMB: 4500, usedBranches: 5, usedLeads: 600, usedQuotations: 250 },
-  { id: "s5", tenantId: "t5", tenantName: "Dream Trips", ownerEmail: "dream@trips.com", plan: "pro", billingCycle: "monthly", price: 1500, startDate: "2026-01-20", endDate: "2026-02-20", status: "cancelled", autoRenew: false, cancelReason: "Switching to competitor", cancelledAt: "2026-02-15" },
-  { id: "s6", tenantId: "t6", tenantName: "New Agency", ownerEmail: "new@agency.com", plan: "pro", billingCycle: "monthly", price: 0, startDate: "2026-03-28", endDate: "2026-04-11", trialStartDate: "2026-03-28", trialEndDate: "2026-04-11", status: "trial", autoRenew: true, usedClients: 5, usedBookings: 8, usedUsers: 2, usedSms: 10, usedStorageMB: 20, usedBranches: 1 },
-  { id: "s7", tenantId: "t7", tenantName: "Sky Wings", ownerEmail: "sky@wings.com", plan: "basic", billingCycle: "monthly", price: 800, startDate: "2026-03-01", endDate: "2026-03-31", status: "overdue", autoRenew: true, lastPaymentDate: "2026-03-01", nextPaymentDate: "2026-03-31" },
-];
+function getPlanPrice(planId: string, cycle: BillingCycle): number {
+  const p = PLANS.find((x) => x.id === planId);
+  if (!p) return 0;
+  const v = cycle === "yearly" ? p.yearlyPrice : p.monthlyPrice;
+  return v < 0 ? 0 : v;
+}
+
+function tenantToSubscription(t: AdminTenant): TenantSubscription {
+  const owner = t.users?.find((u) => u.role === "tenant_owner") || t.users?.[0];
+  const plan = (t.subscriptionPlan || "free") as PlanType;
+  const status = ((t.subscriptionStatus || "active") as SubscriptionStatus);
+  const billingCycle: BillingCycle = "monthly";
+  const startDate = t.createdAt ? t.createdAt.split("T")[0] : "";
+  const endDate = t.subscriptionExpiry ? t.subscriptionExpiry.split("T")[0] : "";
+  return {
+    id: t.id,
+    tenantId: t.id,
+    tenantName: t.name,
+    ownerEmail: owner?.email || "—",
+    plan,
+    billingCycle,
+    price: getPlanPrice(plan, billingCycle),
+    startDate,
+    endDate,
+    status,
+    autoRenew: false,
+    usedUsers: t._count?.users || 0,
+    usedBookings: t._count?.bookings || 0,
+  };
+}
 
 const AdminSubscriptions = () => {
-  const [subscriptions, setSubscriptions] = useState<TenantSubscription[]>(mockSubscriptions);
+  const [subscriptions, setSubscriptions] = useState<TenantSubscription[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    adminApi.getTenants()
+      .then((tenants) => { if (alive) setSubscriptions(tenants.map(tenantToSubscription)); })
+      .catch(() => {})
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, []);
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [planFilter, setPlanFilter] = useState("all");
@@ -280,7 +313,7 @@ const AdminSubscriptions = () => {
               </TableHeader>
               <TableBody>
                 {filtered.length === 0 ? (
-                  <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">No subscriptions found.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">{loading ? "Loading subscriptions…" : "No subscriptions found."}</TableCell></TableRow>
                 ) : (
                   filtered.map((sub) => {
                     const meta = getStatusMeta(sub.status);
