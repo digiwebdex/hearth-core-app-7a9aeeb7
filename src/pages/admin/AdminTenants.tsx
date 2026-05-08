@@ -143,7 +143,7 @@ const AdminTenants = () => {
 
       const ownerPayload: { name?: string; email?: string; password?: string } = {};
       if (ownerName && ownerName !== owner?.name) ownerPayload.name = ownerName;
-      if (ownerEmail && ownerEmail.toLowerCase() !== (owner?.email || "").toLowerCase()) ownerPayload.email = ownerEmail;
+      if (ownerEmail && ownerEmail !== (owner?.email || "")) ownerPayload.email = ownerEmail;
       if (ownerPassword) ownerPayload.password = ownerPassword;
       if (Object.keys(ownerPayload).length > 0) {
         await adminApi.updateTenantOwner(editTenant.id, ownerPayload);
