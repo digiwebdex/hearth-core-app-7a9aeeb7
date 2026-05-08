@@ -89,7 +89,7 @@ const AppContent = () => (
         <Sonner />
         <Routes>
           {/* Main landing page */}
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={getReservedSubdomain(window.location.hostname) === "app" ? <Navigate to="/login" replace /> : <Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
