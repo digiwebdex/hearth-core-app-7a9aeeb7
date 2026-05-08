@@ -948,6 +948,17 @@ export const adminApi = {
   getStats: () => request<AdminStats>("/admin/stats"),
   getTenants: () => request<AdminTenant[]>("/admin/tenants"),
   getTenant: (id: string) => request<AdminTenant>(`/admin/tenants/${id}`),
+  createTenant: (data: {
+    tenantName: string;
+    ownerName: string;
+    ownerEmail: string;
+    ownerPassword: string;
+    subscriptionPlan?: string;
+    subscriptionStatus?: string;
+    subscriptionMonths?: number;
+  }) => request<{ tenant: AdminTenant; user: { id: string; name: string; email: string; role: string } }>(
+    `/admin/tenants`, { method: "POST", body: JSON.stringify(data) }
+  ),
   updateTenant: (id: string, data: Partial<AdminTenant>) =>
     request<AdminTenant>(`/admin/tenants/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   getPaymentRequests: () => request<AdminPaymentRequest[]>("/admin/payment-requests"),

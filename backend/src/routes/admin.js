@@ -1,8 +1,65 @@
 const router = require("express").Router();
+const bcrypt = require("bcryptjs");
 const { authenticate, requireSuperAdmin, prisma } = require("../middleware/auth");
 
 router.use(authenticate);
 router.use(requireSuperAdmin);
+
+// Create tenant manually (super admin)
+router.post("/tenants", async (req, res) => {
+  try {
+    const {
+      tenantName, ownerName, ownerEmail, ownerPassword,
+      subscriptionPlan = "basic",
+      subscriptionStatus = "active",
+      subscriptionMonths = 1,
+    } = req.body;
+
+    if (!tenantName || !ownerName || !ownerEmail || !ownerPassword) {
+      return res.status(400).json({ message: "tenantName, ownerName, ownerEmail and ownerPassword are required" });
+    }
+
+    const exists = await prisma.user.findUnique({ where: { email: ownerEmail } });
+    if (exists) return res.status(400).json({ message: "Email already registered" });
+
+    const rawSlug = tenantName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50);
+    let slug = rawSlug || "tenant";
+    let suffix = 1;
+    while (await prisma.tenant.findUnique({ where: { slug } })) {
+      slug = `${rawSlug}-${suffix++}`;
+    }
+
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + Number(subscriptionMonths || 1));
+
+    const tenant = await prisma.tenant.create({
+      data: {
+        name: tenantName, slug,
+        subscriptionPlan, subscriptionStatus,
+        subscriptionExpiry: expiry,
+      },
+    });
+
+    const hashed = await bcrypt.hash(ownerPassword, 10);
+    const user = await prisma.user.create({
+      data: { name: ownerName, email: ownerEmail, password: hashed, role: "tenant_owner", tenantId: tenant.id },
+    });
+    await prisma.tenant.update({ where: { id: tenant.id }, data: { ownerId: user.id } });
+
+    const actor = await prisma.user.findUnique({ where: { id: req.userId }, select: { name: true, email: true, role: true } });
+    await prisma.auditLog.create({
+      data: {
+        actorId: req.userId, actorName: actor?.name || "", actorEmail: actor?.email || "", actorRole: actor?.role || "",
+        tenantId: tenant.id, tenantName: tenant.name,
+        module: "admin", action: "tenant_created",
+        targetType: "tenant", targetId: tenant.id, targetLabel: tenant.name,
+        newValue: JSON.stringify({ plan: subscriptionPlan, status: subscriptionStatus, months: subscriptionMonths }),
+      },
+    }).catch(() => {});
+
+    res.json({ tenant, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
 
 // All tenants
 router.get("/tenants", async (req, res) => {
