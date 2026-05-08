@@ -46,5 +46,7 @@ sudo nginx -t && sudo systemctl reload nginx
 
 echo ""
 echo "✅ Deployment complete!"
-echo "   Frontend: https://travelagencyweb.com"
+echo "   Main:     https://travelagencyweb.com"
+echo "   App:      https://app.travelagencyweb.com"
+echo "   Portal:   https://portal.travelagencyweb.com"
 echo "   API:      https://api.travelagencyweb.com/api/health"
