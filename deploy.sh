@@ -13,11 +13,20 @@ echo "═══ Step 1: Pull latest code ═══"
 cd "$APP_DIR"
 git pull origin main
 
-echo "═══ Step 2: Build frontend ═══"
+echo "═══ Step 2: Ensure build env ═══"
+if [ ! -f .env.production ]; then
+  cat > .env.production << 'EOF'
+VITE_API_URL=https://api.travelagencyweb.com/api
+VITE_APP_DOMAIN=travelagencyweb.com
+EOF
+  echo "✅ Created .env.production"
+fi
+
+echo "═══ Step 3: Build frontend ═══"
 npm install
 npm run build
 
-echo "═══ Step 3: Deploy backend ═══"
+echo "═══ Step 4: Deploy backend ═══"
 cd "$BACKEND_DIR"
 
 if [ ! -f .env ]; then
@@ -37,5 +46,7 @@ sudo nginx -t && sudo systemctl reload nginx
 
 echo ""
 echo "✅ Deployment complete!"
-echo "   Frontend: https://travelagencyweb.com"
+echo "   Main:     https://travelagencyweb.com"
+echo "   App:      https://app.travelagencyweb.com"
+echo "   Portal:   https://portal.travelagencyweb.com"
 echo "   API:      https://api.travelagencyweb.com/api/health"
