@@ -11,6 +11,8 @@ const normalizeOrigin = (value) => value?.trim().replace(/\/$/, "");
 const defaultOrigins = [
   "https://travelagencyweb.com",
   "https://www.travelagencyweb.com",
+  "https://app.travelagencyweb.com",
+  "https://portal.travelagencyweb.com",
   "http://localhost:5173",
 ];
 const allowedOrigins = (process.env.CORS_ORIGIN
