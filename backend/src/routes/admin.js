@@ -151,9 +151,9 @@ router.patch("/tenants/:id/owner", async (req, res) => {
     const data = {};
     if (name !== undefined && name !== null && String(name).trim() !== "") data.name = String(name).trim();
     if (email !== undefined && email !== null && String(email).trim() !== "") {
-      const newEmail = String(email).trim().toLowerCase();
+      const newEmail = String(email).trim();
       if (newEmail !== owner.email) {
-        const dup = await prisma.user.findUnique({ where: { email: newEmail } });
+        const dup = await prisma.user.findFirst({ where: { email: { equals: newEmail, mode: "insensitive" } } });
         if (dup && dup.id !== owner.id) return res.status(400).json({ message: "Email already in use" });
         data.email = newEmail;
       }
