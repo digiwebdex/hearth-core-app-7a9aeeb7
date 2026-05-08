@@ -953,6 +953,15 @@ export const adminApi = {
     ownerName: string;
     ownerEmail: string;
     ownerPassword: string;
+    ownerPhone?: string;
+    ownerWhatsapp?: string;
+    companyPhone?: string;
+    companyWhatsapp?: string;
+    companyAddress?: string;
+    companyCity?: string;
+    companyCountry?: string;
+    companyWebsite?: string;
+    companyNotes?: string;
     subscriptionPlan?: string;
     subscriptionStatus?: string;
     subscriptionMonths?: number;
