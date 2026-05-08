@@ -20,10 +20,26 @@ const allowedOrigins = (process.env.CORS_ORIGIN
   : defaultOrigins
 ).map(normalizeOrigin);
 
+const isTravelAgencyWebOrigin = (origin) => {
+  try {
+    const { protocol, hostname } = new URL(origin);
+    return protocol === "https:" && (
+      hostname === "travelagencyweb.com" || hostname.endsWith(".travelagencyweb.com")
+    );
+  } catch {
+    return false;
+  }
+};
+
 app.use(cors({
   origin: (origin, callback) => {
     const requestOrigin = normalizeOrigin(origin);
-    if (!requestOrigin || allowedOrigins.includes("*") || allowedOrigins.includes(requestOrigin)) {
+    if (
+      !requestOrigin ||
+      allowedOrigins.includes("*") ||
+      allowedOrigins.includes(requestOrigin) ||
+      isTravelAgencyWebOrigin(requestOrigin)
+    ) {
       callback(null, true);
     } else {
       callback(null, false);
