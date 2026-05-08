@@ -9,8 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Ban, CheckCircle, Eye, Search, RefreshCw, Plus } from "lucide-react";
+import { Ban, CheckCircle, Eye, Search, RefreshCw, Plus, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi, type AdminTenant } from "@/lib/api";
 
@@ -22,6 +23,11 @@ const AdminTenants = () => {
   const { toast } = useToast();
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [editTenant, setEditTenant] = useState<AdminTenant | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", subscriptionPlan: "basic", subscriptionStatus: "active", subscriptionExpiry: "", phone: "", whatsapp: "", address: "", city: "", country: "", website: "", notes: "" });
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AdminTenant | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState({
     tenantName: "",
     ownerName: "",
@@ -102,6 +108,55 @@ const AdminTenants = () => {
       });
     } catch (err: any) {
       toast({ title: "Action failed", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const openEdit = (t: AdminTenant) => {
+    setEditTenant(t);
+    setEditForm({
+      name: t.name || "",
+      subscriptionPlan: t.subscriptionPlan || "basic",
+      subscriptionStatus: t.subscriptionStatus || "active",
+      subscriptionExpiry: (t as any).subscriptionExpiry ? new Date((t as any).subscriptionExpiry).toISOString().slice(0, 10) : "",
+      phone: (t as any).phone || "",
+      whatsapp: (t as any).whatsapp || "",
+      address: (t as any).address || "",
+      city: (t as any).city || "",
+      country: (t as any).country || "",
+      website: (t as any).website || "",
+      notes: (t as any).notes || "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editTenant) return;
+    setSavingEdit(true);
+    try {
+      const payload: any = { ...editForm };
+      if (!payload.subscriptionExpiry) delete payload.subscriptionExpiry;
+      await adminApi.updateTenant(editTenant.id, payload);
+      toast({ title: "Agency updated", description: editForm.name });
+      setEditTenant(null);
+      fetchTenants();
+    } catch (err: any) {
+      toast({ title: "Update failed", description: err.message, variant: "destructive" });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await adminApi.deleteTenant(deleteTarget.id);
+      toast({ title: "Agency deleted", description: deleteTarget.name, variant: "destructive" });
+      setDeleteTarget(null);
+      fetchTenants();
+    } catch (err: any) {
+      toast({ title: "Delete failed", description: err.message, variant: "destructive" });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -258,7 +313,7 @@ const AdminTenants = () => {
                     <TableHead className="text-center">Bookings</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Created</TableHead>
-                    <TableHead className="w-[140px]">Actions</TableHead>
+                    <TableHead className="w-[200px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -296,12 +351,18 @@ const AdminTenants = () => {
                               <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/tenants/${t.id}`)} title="View details">
                                 <Eye className="h-4 w-4" />
                               </Button>
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(t)} title="Edit">
+                                <Pencil className="h-4 w-4" />
+                              </Button>
                               <Button variant="ghost" size="icon" onClick={() => toggleSuspend(t)} title={t.subscriptionStatus === "suspended" ? "Reactivate" : "Suspend"}>
                                 {t.subscriptionStatus === "suspended" ? (
                                   <CheckCircle className="h-4 w-4 text-green-600" />
                                 ) : (
                                   <Ban className="h-4 w-4 text-destructive" />
                                 )}
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(t)} title="Delete">
+                                <Trash2 className="h-4 w-4 text-destructive" />
                               </Button>
                             </div>
                           </TableCell>
@@ -315,6 +376,82 @@ const AdminTenants = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={!!editTenant} onOpenChange={(o) => !o && setEditTenant(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Agency</DialogTitle>
+            <DialogDescription>Update company info and subscription.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="grid gap-2">
+              <Label>Company Name</Label>
+              <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="grid gap-2">
+                <Label>Plan</Label>
+                <Select value={editForm.subscriptionPlan} onValueChange={(v) => setEditForm({ ...editForm, subscriptionPlan: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="basic">Basic</SelectItem>
+                    <SelectItem value="pro">Pro</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                    <SelectItem value="enterprise">Unlimited</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Status</Label>
+                <Select value={editForm.subscriptionStatus} onValueChange={(v) => setEditForm({ ...editForm, subscriptionStatus: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="trial">Trial</SelectItem>
+                    <SelectItem value="suspended">Suspended</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Expiry</Label>
+                <Input type="date" value={editForm.subscriptionExpiry} onChange={(e) => setEditForm({ ...editForm, subscriptionExpiry: e.target.value })} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-2"><Label>Phone</Label><Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} /></div>
+              <div className="grid gap-2"><Label>WhatsApp</Label><Input value={editForm.whatsapp} onChange={(e) => setEditForm({ ...editForm, whatsapp: e.target.value })} /></div>
+            </div>
+            <div className="grid gap-2"><Label>Address</Label><Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} /></div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="grid gap-2"><Label>City</Label><Input value={editForm.city} onChange={(e) => setEditForm({ ...editForm, city: e.target.value })} /></div>
+              <div className="grid gap-2"><Label>Country</Label><Input value={editForm.country} onChange={(e) => setEditForm({ ...editForm, country: e.target.value })} /></div>
+              <div className="grid gap-2"><Label>Website</Label><Input value={editForm.website} onChange={(e) => setEditForm({ ...editForm, website: e.target.value })} /></div>
+            </div>
+            <div className="grid gap-2"><Label>Notes</Label><Input value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditTenant(null)} disabled={savingEdit}>Cancel</Button>
+            <Button onClick={saveEdit} disabled={savingEdit}>{savingEdit ? "Saving…" : "Save changes"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete agency?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{deleteTarget?.name}</strong> and all its users, bookings, clients, invoices, and related data. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? "Deleting…" : "Delete permanently"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };

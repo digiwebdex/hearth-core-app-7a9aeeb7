@@ -105,6 +105,7 @@ router.get("/tenants/:id", async (req, res) => {
 // Only allow safe fields for admin tenant update
 const ADMIN_ALLOWED_TENANT_FIELDS = [
   "name", "subscriptionPlan", "subscriptionStatus", "subscriptionExpiry",
+  "phone", "whatsapp", "address", "city", "country", "website", "notes",
 ];
 
 router.patch("/tenants/:id", async (req, res) => {
@@ -113,7 +114,54 @@ router.patch("/tenants/:id", async (req, res) => {
     for (const key of ADMIN_ALLOWED_TENANT_FIELDS) {
       if (req.body[key] !== undefined) data[key] = req.body[key];
     }
-    res.json(await prisma.tenant.update({ where: { id: req.params.id }, data }));
+    if (data.subscriptionExpiry) data.subscriptionExpiry = new Date(data.subscriptionExpiry);
+    const updated = await prisma.tenant.update({ where: { id: req.params.id }, data });
+    const actor = await prisma.user.findUnique({ where: { id: req.userId }, select: { name: true, email: true, role: true } });
+    await prisma.auditLog.create({
+      data: {
+        actorId: req.userId, actorName: actor?.name || "", actorEmail: actor?.email || "", actorRole: actor?.role || "",
+        tenantId: updated.id, tenantName: updated.name,
+        module: "admin", action: "tenant_updated",
+        targetType: "tenant", targetId: updated.id, targetLabel: updated.name,
+        newValue: JSON.stringify(data),
+      },
+    }).catch(() => {});
+    res.json(updated);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+// Delete tenant (super admin) — cascades via Prisma relations where configured
+router.delete("/tenants/:id", async (req, res) => {
+  try {
+    const t = await prisma.tenant.findUnique({ where: { id: req.params.id } });
+    if (!t) return res.status(404).json({ message: "Not found" });
+
+    // Best-effort cascade — delete dependent rows that may not have ON DELETE CASCADE
+    const tx = [];
+    const tryDel = (model) => { if (prisma[model]) tx.push(prisma[model].deleteMany({ where: { tenantId: t.id } }).catch(() => {})); };
+    [
+      "payment", "invoice", "quotation", "booking", "lead", "client", "vendor",
+      "expense", "task", "agent", "account", "tenantDomain", "smsLog", "notification",
+      "subscription", "paymentRequest", "auditLog",
+    ].forEach(tryDel);
+    await Promise.all(tx);
+
+    // Detach owner reference, then remove users, then tenant
+    await prisma.tenant.update({ where: { id: t.id }, data: { ownerId: null } }).catch(() => {});
+    await prisma.user.deleteMany({ where: { tenantId: t.id } }).catch(() => {});
+    await prisma.tenant.delete({ where: { id: t.id } });
+
+    const actor = await prisma.user.findUnique({ where: { id: req.userId }, select: { name: true, email: true, role: true } });
+    await prisma.auditLog.create({
+      data: {
+        actorId: req.userId, actorName: actor?.name || "", actorEmail: actor?.email || "", actorRole: actor?.role || "",
+        tenantId: null, tenantName: t.name,
+        module: "admin", action: "tenant_deleted",
+        targetType: "tenant", targetId: t.id, targetLabel: t.name,
+      },
+    }).catch(() => {});
+
+    res.json({ success: true });
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 

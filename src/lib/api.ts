@@ -970,6 +970,8 @@ export const adminApi = {
   ),
   updateTenant: (id: string, data: Partial<AdminTenant>) =>
     request<AdminTenant>(`/admin/tenants/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  deleteTenant: (id: string) =>
+    request<{ success: boolean }>(`/admin/tenants/${id}`, { method: "DELETE" }),
   getPaymentRequests: () => request<AdminPaymentRequest[]>("/admin/payment-requests"),
   updatePaymentRequest: (id: string, data: Partial<AdminPaymentRequest>) =>
     request<AdminPaymentRequest>(`/admin/payment-requests/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
