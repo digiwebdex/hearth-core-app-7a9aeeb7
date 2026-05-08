@@ -376,6 +376,82 @@ const AdminTenants = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={!!editTenant} onOpenChange={(o) => !o && setEditTenant(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Agency</DialogTitle>
+            <DialogDescription>Update company info and subscription.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="grid gap-2">
+              <Label>Company Name</Label>
+              <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="grid gap-2">
+                <Label>Plan</Label>
+                <Select value={editForm.subscriptionPlan} onValueChange={(v) => setEditForm({ ...editForm, subscriptionPlan: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="basic">Basic</SelectItem>
+                    <SelectItem value="pro">Pro</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                    <SelectItem value="enterprise">Unlimited</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Status</Label>
+                <Select value={editForm.subscriptionStatus} onValueChange={(v) => setEditForm({ ...editForm, subscriptionStatus: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="trial">Trial</SelectItem>
+                    <SelectItem value="suspended">Suspended</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Expiry</Label>
+                <Input type="date" value={editForm.subscriptionExpiry} onChange={(e) => setEditForm({ ...editForm, subscriptionExpiry: e.target.value })} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-2"><Label>Phone</Label><Input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} /></div>
+              <div className="grid gap-2"><Label>WhatsApp</Label><Input value={editForm.whatsapp} onChange={(e) => setEditForm({ ...editForm, whatsapp: e.target.value })} /></div>
+            </div>
+            <div className="grid gap-2"><Label>Address</Label><Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} /></div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="grid gap-2"><Label>City</Label><Input value={editForm.city} onChange={(e) => setEditForm({ ...editForm, city: e.target.value })} /></div>
+              <div className="grid gap-2"><Label>Country</Label><Input value={editForm.country} onChange={(e) => setEditForm({ ...editForm, country: e.target.value })} /></div>
+              <div className="grid gap-2"><Label>Website</Label><Input value={editForm.website} onChange={(e) => setEditForm({ ...editForm, website: e.target.value })} /></div>
+            </div>
+            <div className="grid gap-2"><Label>Notes</Label><Input value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditTenant(null)} disabled={savingEdit}>Cancel</Button>
+            <Button onClick={saveEdit} disabled={savingEdit}>{savingEdit ? "Saving…" : "Save changes"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete agency?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{deleteTarget?.name}</strong> and all its users, bookings, clients, invoices, and related data. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? "Deleting…" : "Delete permanently"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };
