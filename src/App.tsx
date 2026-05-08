@@ -8,6 +8,8 @@ import { WebsiteProvider } from "@/contexts/WebsiteContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminRoute from "@/components/AdminRoute";
 import Login from "./pages/Login";
+import { Navigate } from "react-router-dom";
+import { getReservedSubdomain } from "@/lib/domainResolver";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
