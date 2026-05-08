@@ -4,10 +4,13 @@ import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ban, CheckCircle, Eye, Search, RefreshCw } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Ban, CheckCircle, Eye, Search, RefreshCw, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi, type AdminTenant } from "@/lib/api";
 
@@ -17,6 +20,41 @@ const AdminTenants = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const { toast } = useToast();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({
+    tenantName: "",
+    ownerName: "",
+    ownerEmail: "",
+    ownerPassword: "",
+    subscriptionPlan: "basic",
+    subscriptionStatus: "active",
+    subscriptionMonths: 1,
+  });
+
+  const resetForm = () => setForm({
+    tenantName: "", ownerName: "", ownerEmail: "", ownerPassword: "",
+    subscriptionPlan: "basic", subscriptionStatus: "active", subscriptionMonths: 1,
+  });
+
+  const handleCreate = async () => {
+    if (!form.tenantName || !form.ownerName || !form.ownerEmail || !form.ownerPassword) {
+      toast({ title: "Missing fields", description: "All fields are required", variant: "destructive" });
+      return;
+    }
+    setCreating(true);
+    try {
+      await adminApi.createTenant({ ...form, subscriptionMonths: Number(form.subscriptionMonths) });
+      toast({ title: "Tenant created", description: form.tenantName });
+      setCreateOpen(false);
+      resetForm();
+      fetchTenants();
+    } catch (err: any) {
+      toast({ title: "Failed to create tenant", description: err.message, variant: "destructive" });
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const fetchTenants = async () => {
     setLoading(true);
@@ -63,9 +101,75 @@ const AdminTenants = () => {
             <h1 className="text-3xl font-bold tracking-tight">All Tenants</h1>
             <p className="text-muted-foreground">View and manage all registered companies</p>
           </div>
-          <Button variant="outline" size="sm" onClick={fetchTenants} disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) resetForm(); }}>
+              <DialogTrigger asChild>
+                <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Create Tenant</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Create New Tenant</DialogTitle>
+                  <DialogDescription>Manually create a company and its owner account with a subscription.</DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-2">
+                  <div className="grid gap-2">
+                    <Label>Company Name</Label>
+                    <Input value={form.tenantName} onChange={(e) => setForm({ ...form, tenantName: e.target.value })} placeholder="Al-Safa Travel Agency" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="grid gap-2">
+                      <Label>Owner Name</Label>
+                      <Input value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Owner Email</Label>
+                      <Input type="email" value={form.ownerEmail} onChange={(e) => setForm({ ...form, ownerEmail: e.target.value })} />
+                    </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Temporary Password</Label>
+                    <Input type="text" value={form.ownerPassword} onChange={(e) => setForm({ ...form, ownerPassword: e.target.value })} placeholder="Min 6 characters" />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="grid gap-2">
+                      <Label>Plan</Label>
+                      <Select value={form.subscriptionPlan} onValueChange={(v) => setForm({ ...form, subscriptionPlan: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="basic">Basic</SelectItem>
+                          <SelectItem value="pro">Pro</SelectItem>
+                          <SelectItem value="business">Business</SelectItem>
+                          <SelectItem value="enterprise">Unlimited</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Status</Label>
+                      <Select value={form.subscriptionStatus} onValueChange={(v) => setForm({ ...form, subscriptionStatus: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="trial">Trial</SelectItem>
+                          <SelectItem value="suspended">Suspended</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Months</Label>
+                      <Input type="number" min={1} value={form.subscriptionMonths} onChange={(e) => setForm({ ...form, subscriptionMonths: Number(e.target.value) })} />
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={creating}>Cancel</Button>
+                  <Button onClick={handleCreate} disabled={creating}>{creating ? "Creating…" : "Create Tenant"}</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Button variant="outline" size="sm" onClick={fetchTenants} disabled={loading}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 max-w-sm">
