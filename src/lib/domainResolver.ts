@@ -2,13 +2,36 @@
 import { publicApi, type TenantPublic } from "./publicApi";
 
 export interface DomainResolution {
-  type: "slug" | "custom-domain" | "main-app" | "unknown";
+  type: "slug" | "custom-domain" | "main-app" | "portal" | "unknown";
   slug?: string;
   customDomain?: string;
   hostname: string;
 }
 
 const APP_DOMAIN = import.meta.env.VITE_APP_DOMAIN || "";
+
+// Reserved subdomains — never treated as agency slugs.
+// `app`  → main agency staff + super admin app
+// `portal` → customer / supplier self-service portal
+// `api`  → backend API host
+// `www`/`admin` → reserved
+export const RESERVED_SUBDOMAINS = ["app", "portal", "api", "www", "admin"] as const;
+export type ReservedSubdomain = (typeof RESERVED_SUBDOMAINS)[number];
+
+export function getReservedSubdomain(hostname: string): ReservedSubdomain | null {
+  if (!APP_DOMAIN) return null;
+  const bare = hostname.toLowerCase();
+  const bareDomain = APP_DOMAIN.replace(/^www\./, "");
+  if (!bare.endsWith(`.${bareDomain}`)) return null;
+  const sub = bare.replace(`.${bareDomain}`, "");
+  return (RESERVED_SUBDOMAINS as readonly string[]).includes(sub)
+    ? (sub as ReservedSubdomain)
+    : null;
+}
+
+export function isPortalHost(hostname: string = window.location.hostname): boolean {
+  return getReservedSubdomain(hostname) === "portal";
+}
 
 /**
  * Generate subdomain URL for a tenant slug.
@@ -28,7 +51,11 @@ export function extractSlugFromHostname(hostname: string): string | null {
   const bareDomain = APP_DOMAIN.replace(/^www\./, "");
   if (bare.endsWith(`.${bareDomain}`)) {
     const slug = bare.replace(`.${bareDomain}`, "");
-    if (slug && !slug.includes(".") && slug !== "www") {
+    if (
+      slug &&
+      !slug.includes(".") &&
+      !(RESERVED_SUBDOMAINS as readonly string[]).includes(slug)
+    ) {
       return slug;
     }
   }
@@ -60,6 +87,13 @@ export function resolveHostname(): DomainResolution {
   if (bare === bareDomain) {
     return { type: "main-app", hostname };
   }
+
+  // Reserved subdomains (app / portal / api / www / admin)
+  const reserved = getReservedSubdomain(hostname);
+  if (reserved === "portal") return { type: "portal", hostname };
+  if (reserved === "app" || reserved === "admin") return { type: "main-app", hostname };
+  // `api` should never hit the frontend, but if it does treat as main-app
+  if (reserved === "api" || reserved === "www") return { type: "main-app", hostname };
 
   // Subdomain of app domain → extract slug (wildcard DNS: *.yourapp.com)
   const slug = extractSlugFromHostname(hostname);
