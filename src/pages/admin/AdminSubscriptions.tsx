@@ -10,14 +10,15 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
   Search, ArrowUpCircle, ArrowDownCircle, CalendarPlus, XCircle, Eye, Crown,
   Users, AlertTriangle, RefreshCcw, Pause, Play, DollarSign, Clock, CheckCircle2,
-  TrendingUp, Ban, Download,
+  TrendingUp, Ban, Download, Pencil, Trash2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -73,14 +74,15 @@ const AdminSubscriptions = () => {
   const [subscriptions, setSubscriptions] = useState<TenantSubscription[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let alive = true;
-    adminApi.getTenants()
-      .then((tenants) => { if (alive) setSubscriptions(tenants.map(tenantToSubscription)); })
+  const fetchSubs = () => {
+    setLoading(true);
+    return adminApi.getTenants()
+      .then((tenants) => setSubscriptions(tenants.map(tenantToSubscription)))
       .catch(() => {})
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
-  }, []);
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchSubs(); }, []);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -95,6 +97,54 @@ const AdminSubscriptions = () => {
   const [extendUnit, setExtendUnit] = useState<"days" | "months">("months");
   const [extendValue, setExtendValue] = useState("1");
   const [actionReason, setActionReason] = useState("");
+
+  // Edit / delete (real API)
+  const [editSub, setEditSub] = useState<TenantSubscription | null>(null);
+  const [editPlan, setEditPlan] = useState<PlanType>("basic");
+  const [editStatus, setEditStatus] = useState<SubscriptionStatus>("active");
+  const [editExpiry, setEditExpiry] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deleteSub, setDeleteSub] = useState<TenantSubscription | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const openEdit = (s: TenantSubscription) => {
+    setEditSub(s);
+    setEditPlan(s.plan);
+    setEditStatus(s.status);
+    setEditExpiry(s.endDate || "");
+  };
+
+  const saveEdit = async () => {
+    if (!editSub) return;
+    setSavingEdit(true);
+    try {
+      const payload: any = { subscriptionPlan: editPlan, subscriptionStatus: editStatus };
+      if (editExpiry) payload.subscriptionExpiry = editExpiry;
+      await adminApi.updateTenant(editSub.tenantId, payload);
+      toast({ title: "Subscription updated", description: editSub.tenantName });
+      setEditSub(null);
+      await fetchSubs();
+    } catch (err: any) {
+      toast({ title: "Update failed", description: err.message, variant: "destructive" });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteSub) return;
+    setDeleting(true);
+    try {
+      await adminApi.deleteTenant(deleteSub.tenantId);
+      toast({ title: "Subscription deleted", description: deleteSub.tenantName, variant: "destructive" });
+      setDeleteSub(null);
+      await fetchSubs();
+    } catch (err: any) {
+      toast({ title: "Delete failed", description: err.message, variant: "destructive" });
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     return subscriptions.filter((s) => {
@@ -361,6 +411,8 @@ const AdminSubscriptions = () => {
                         <TableCell>
                           <div className="flex gap-1 flex-wrap">
                             <Button variant="ghost" size="icon" className="h-7 w-7" title="View" onClick={() => openAction(sub, "view")}><Eye className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" title="Edit" onClick={() => openEdit(sub)}><Pencil className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" title="Delete" onClick={() => setDeleteSub(sub)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
                             {(sub.status === "active" || sub.status === "trial") && (
                               <>
                                 {getUpgradePlans(sub.plan).length > 0 && (
@@ -572,6 +624,59 @@ const AdminSubscriptions = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Edit subscription */}
+        <Dialog open={!!editSub} onOpenChange={(o) => !o && setEditSub(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle>Edit Subscription — {editSub?.tenantName}</DialogTitle></DialogHeader>
+            <div className="grid gap-4 py-2">
+              <div className="grid gap-2">
+                <Label>Plan</Label>
+                <Select value={editPlan} onValueChange={(v) => setEditPlan(v as PlanType)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {PLANS.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Status</Label>
+                <Select value={editStatus} onValueChange={(v) => setEditStatus(v as SubscriptionStatus)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {STATUS_META.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Expiry Date</Label>
+                <Input type="date" value={editExpiry} onChange={(e) => setEditExpiry(e.target.value)} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditSub(null)} disabled={savingEdit}>Cancel</Button>
+              <Button onClick={saveEdit} disabled={savingEdit}>{savingEdit ? "Saving…" : "Save changes"}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete subscription */}
+        <AlertDialog open={!!deleteSub} onOpenChange={(o) => !o && setDeleteSub(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete subscription?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This permanently deletes <strong>{deleteSub?.tenantName}</strong> along with its users, bookings, clients, invoices, and all related data. This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                {deleting ? "Deleting…" : "Delete permanently"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );

@@ -24,7 +24,7 @@ const AdminTenants = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [editTenant, setEditTenant] = useState<AdminTenant | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", subscriptionPlan: "basic", subscriptionStatus: "active", subscriptionExpiry: "", phone: "", whatsapp: "", address: "", city: "", country: "", website: "", notes: "" });
+  const [editForm, setEditForm] = useState({ name: "", subscriptionPlan: "basic", subscriptionStatus: "active", subscriptionExpiry: "", phone: "", whatsapp: "", address: "", city: "", country: "", website: "", notes: "", ownerName: "", ownerEmail: "", ownerPassword: "" });
   const [savingEdit, setSavingEdit] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<AdminTenant | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -112,6 +112,7 @@ const AdminTenants = () => {
   };
 
   const openEdit = (t: AdminTenant) => {
+    const owner = t.users?.find((u) => u.role === "tenant_owner" || u.role === "owner") || t.users?.[0];
     setEditTenant(t);
     setEditForm({
       name: t.name || "",
@@ -125,6 +126,9 @@ const AdminTenants = () => {
       country: (t as any).country || "",
       website: (t as any).website || "",
       notes: (t as any).notes || "",
+      ownerName: owner?.name || "",
+      ownerEmail: owner?.email || "",
+      ownerPassword: "",
     });
   };
 
@@ -132,9 +136,19 @@ const AdminTenants = () => {
     if (!editTenant) return;
     setSavingEdit(true);
     try {
-      const payload: any = { ...editForm };
-      if (!payload.subscriptionExpiry) delete payload.subscriptionExpiry;
-      await adminApi.updateTenant(editTenant.id, payload);
+      const owner = editTenant.users?.find((u) => u.role === "tenant_owner" || u.role === "owner") || editTenant.users?.[0];
+      const { ownerName, ownerEmail, ownerPassword, ...tenantPayload } = editForm as any;
+      if (!tenantPayload.subscriptionExpiry) delete tenantPayload.subscriptionExpiry;
+      await adminApi.updateTenant(editTenant.id, tenantPayload);
+
+      const ownerPayload: { name?: string; email?: string; password?: string } = {};
+      if (ownerName && ownerName !== owner?.name) ownerPayload.name = ownerName;
+      if (ownerEmail && ownerEmail.toLowerCase() !== (owner?.email || "").toLowerCase()) ownerPayload.email = ownerEmail;
+      if (ownerPassword) ownerPayload.password = ownerPassword;
+      if (Object.keys(ownerPayload).length > 0) {
+        await adminApi.updateTenantOwner(editTenant.id, ownerPayload);
+      }
+
       toast({ title: "Agency updated", description: editForm.name });
       setEditTenant(null);
       fetchTenants();
@@ -428,6 +442,18 @@ const AdminTenants = () => {
               <div className="grid gap-2"><Label>Website</Label><Input value={editForm.website} onChange={(e) => setEditForm({ ...editForm, website: e.target.value })} /></div>
             </div>
             <div className="grid gap-2"><Label>Notes</Label><Input value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} /></div>
+
+            <div className="space-y-3 border-t pt-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Owner Account</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-2"><Label>Owner Name</Label><Input value={editForm.ownerName} onChange={(e) => setEditForm({ ...editForm, ownerName: e.target.value })} /></div>
+                <div className="grid gap-2"><Label>Owner Email</Label><Input type="email" value={editForm.ownerEmail} onChange={(e) => setEditForm({ ...editForm, ownerEmail: e.target.value })} /></div>
+              </div>
+              <div className="grid gap-2">
+                <Label>Reset Password</Label>
+                <Input type="text" value={editForm.ownerPassword} onChange={(e) => setEditForm({ ...editForm, ownerPassword: e.target.value })} placeholder="Leave blank to keep current password (min 6 chars)" />
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditTenant(null)} disabled={savingEdit}>Cancel</Button>

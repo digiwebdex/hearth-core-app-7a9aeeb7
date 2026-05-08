@@ -130,6 +130,58 @@ router.patch("/tenants/:id", async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
+// Update tenant owner (name/email/password) — super admin
+router.patch("/tenants/:id/owner", async (req, res) => {
+  try {
+    const { name, email, password } = req.body || {};
+    const tenant = await prisma.tenant.findUnique({ where: { id: req.params.id } });
+    if (!tenant) return res.status(404).json({ message: "Tenant not found" });
+
+    let owner = null;
+    if (tenant.ownerId) {
+      owner = await prisma.user.findUnique({ where: { id: tenant.ownerId } });
+    }
+    if (!owner) {
+      owner = await prisma.user.findFirst({
+        where: { tenantId: tenant.id, role: { in: ["tenant_owner", "owner"] } },
+      });
+    }
+    if (!owner) return res.status(404).json({ message: "Owner account not found" });
+
+    const data = {};
+    if (name !== undefined && name !== null && String(name).trim() !== "") data.name = String(name).trim();
+    if (email !== undefined && email !== null && String(email).trim() !== "") {
+      const newEmail = String(email).trim().toLowerCase();
+      if (newEmail !== owner.email) {
+        const dup = await prisma.user.findUnique({ where: { email: newEmail } });
+        if (dup && dup.id !== owner.id) return res.status(400).json({ message: "Email already in use" });
+        data.email = newEmail;
+      }
+    }
+    if (password !== undefined && password !== null && String(password).length > 0) {
+      if (String(password).length < 6) return res.status(400).json({ message: "Password must be at least 6 characters" });
+      data.password = await bcrypt.hash(String(password), 10);
+    }
+
+    if (Object.keys(data).length === 0) return res.status(400).json({ message: "No changes provided" });
+
+    const updated = await prisma.user.update({ where: { id: owner.id }, data });
+
+    const actor = await prisma.user.findUnique({ where: { id: req.userId }, select: { name: true, email: true, role: true } });
+    await prisma.auditLog.create({
+      data: {
+        actorId: req.userId, actorName: actor?.name || "", actorEmail: actor?.email || "", actorRole: actor?.role || "",
+        tenantId: tenant.id, tenantName: tenant.name,
+        module: "admin", action: data.password ? "owner_password_reset" : "owner_updated",
+        targetType: "user", targetId: owner.id, targetLabel: updated.email,
+        newValue: JSON.stringify({ ...data, password: data.password ? "[hashed]" : undefined }),
+      },
+    }).catch(() => {});
+
+    res.json({ id: updated.id, name: updated.name, email: updated.email, role: updated.role });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
 // Delete tenant (super admin) — cascades via Prisma relations where configured
 router.delete("/tenants/:id", async (req, res) => {
   try {
