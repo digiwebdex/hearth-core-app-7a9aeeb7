@@ -411,6 +411,8 @@ const AdminSubscriptions = () => {
                         <TableCell>
                           <div className="flex gap-1 flex-wrap">
                             <Button variant="ghost" size="icon" className="h-7 w-7" title="View" onClick={() => openAction(sub, "view")}><Eye className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" title="Edit" onClick={() => openEdit(sub)}><Pencil className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" title="Delete" onClick={() => setDeleteSub(sub)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
                             {(sub.status === "active" || sub.status === "trial") && (
                               <>
                                 {getUpgradePlans(sub.plan).length > 0 && (
