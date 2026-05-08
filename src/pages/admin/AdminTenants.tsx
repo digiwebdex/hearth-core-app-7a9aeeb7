@@ -351,12 +351,18 @@ const AdminTenants = () => {
                               <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/tenants/${t.id}`)} title="View details">
                                 <Eye className="h-4 w-4" />
                               </Button>
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(t)} title="Edit">
+                                <Pencil className="h-4 w-4" />
+                              </Button>
                               <Button variant="ghost" size="icon" onClick={() => toggleSuspend(t)} title={t.subscriptionStatus === "suspended" ? "Reactivate" : "Suspend"}>
                                 {t.subscriptionStatus === "suspended" ? (
                                   <CheckCircle className="h-4 w-4 text-green-600" />
                                 ) : (
                                   <Ban className="h-4 w-4 text-destructive" />
                                 )}
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(t)} title="Delete">
+                                <Trash2 className="h-4 w-4 text-destructive" />
                               </Button>
                             </div>
                           </TableCell>
