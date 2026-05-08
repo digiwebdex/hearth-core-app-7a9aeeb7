@@ -4,10 +4,13 @@ import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Ban, CheckCircle, Eye, Search, RefreshCw } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Ban, CheckCircle, Eye, Search, RefreshCw, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { adminApi, type AdminTenant } from "@/lib/api";
 
@@ -17,8 +20,42 @@ const AdminTenants = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const { toast } = useToast();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({
+    tenantName: "",
+    ownerName: "",
+    ownerEmail: "",
+    ownerPassword: "",
+    subscriptionPlan: "basic",
+    subscriptionStatus: "active",
+    subscriptionMonths: 1,
+  });
 
-  const fetchTenants = async () => {
+  const resetForm = () => setForm({
+    tenantName: "", ownerName: "", ownerEmail: "", ownerPassword: "",
+    subscriptionPlan: "basic", subscriptionStatus: "active", subscriptionMonths: 1,
+  });
+
+  const handleCreate = async () => {
+    if (!form.tenantName || !form.ownerName || !form.ownerEmail || !form.ownerPassword) {
+      toast({ title: "Missing fields", description: "All fields are required", variant: "destructive" });
+      return;
+    }
+    setCreating(true);
+    try {
+      await adminApi.createTenant({ ...form, subscriptionMonths: Number(form.subscriptionMonths) });
+      toast({ title: "Tenant created", description: form.tenantName });
+      setCreateOpen(false);
+      resetForm();
+      fetchTenants();
+    } catch (err: any) {
+      toast({ title: "Failed to create tenant", description: err.message, variant: "destructive" });
+    } finally {
+      setCreating(false);
+    }
+  };
+
     setLoading(true);
     try {
       const data = await adminApi.getTenants();
