@@ -42,6 +42,7 @@ import PaymentCallback from "./pages/PaymentCallback";
 import RoleManagement from "./pages/RoleManagement";
 import NotificationLog from "./pages/NotificationLog";
 import Onboarding from "./pages/Onboarding";
+import UserGuide from "./pages/UserGuide";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTenants from "./pages/admin/AdminTenants";
 import AdminPayments from "./pages/admin/AdminPayments";
@@ -140,6 +141,7 @@ const AppContent = () => (
               <Route path="/organization" element={<P><Organization /></P>} />
               <Route path="/settings" element={<P><SettingsPage /></P>} />
               <Route path="/website" element={<P><WebsiteCustomizer /></P>} />
+              <Route path="/user-guide" element={<P><UserGuide /></P>} />
 
               {/* Admin routes */}
               <Route path="/admin" element={<A><AdminDashboard /></A>} />

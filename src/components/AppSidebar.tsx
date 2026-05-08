@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Settings, Building2, LogOut, UserCheck, UserCog, Store, Target, ListTodo, Plane, Receipt, Wallet, Crown, Shield, BarChart3, Moon, Globe, Lock, UserCog2, FileText, Bell } from "lucide-react";
+import { LayoutDashboard, Users, Settings, Building2, LogOut, UserCheck, UserCog, Store, Target, ListTodo, Plane, Receipt, Wallet, Crown, Shield, BarChart3, Moon, Globe, Lock, UserCog2, FileText, Bell, BookOpen } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -57,6 +57,7 @@ const managementItems: MenuItem[] = [
   { title: "Website", url: "/website", icon: Globe, module: "website", requiredFeature: "hasWebsiteTemplates", minPlan: "pro" },
   { title: "Subscription", url: "/subscription", icon: Crown, module: "subscription" },
   { title: "Settings", url: "/settings", icon: Settings, module: "settings" },
+  { title: "User Guide (বাংলা)", url: "/user-guide", icon: BookOpen, module: "dashboard" },
 ];
 
 const planOrder: PlanType[] = ["free", "basic", "pro", "business", "enterprise"];
