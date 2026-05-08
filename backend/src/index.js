@@ -64,6 +64,9 @@ app.use("/api/admin/domains", require("./routes/domains"));
 app.use("/api/contact", require("./routes/contact"));
 app.use("/api/demo-requests", require("./routes/demo"));
 
+// Customer / Supplier portal (separate JWT audience)
+app.use("/api/portal", require("./routes/portal"));
+
 // Email routes (authenticated)
 app.use("/api/email", require("./routes/email"));
 
