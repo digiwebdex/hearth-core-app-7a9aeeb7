@@ -13,6 +13,13 @@ model Tenant {
   name               String
   slug               String?  @unique
   ownerId            String?
+  phone              String?
+  whatsapp           String?
+  address            String?
+  city               String?
+  country            String?
+  website            String?
+  notes              String?
   subscriptionPlan   String   @default("free")
   subscriptionStatus String   @default("active")
   subscriptionExpiry DateTime?
@@ -65,6 +72,8 @@ model User {
   email            String    @unique
   password         String
   role             String    @default("sales_agent")
+  phone            String?
+  whatsapp         String?
   resetToken       String?
   resetTokenExpiry DateTime?
   tenantId         String

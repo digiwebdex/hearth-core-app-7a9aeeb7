@@ -27,6 +27,15 @@ const AdminTenants = () => {
     ownerName: "",
     ownerEmail: "",
     ownerPassword: "",
+    ownerPhone: "",
+    ownerWhatsapp: "",
+    companyPhone: "",
+    companyWhatsapp: "",
+    companyAddress: "",
+    companyCity: "",
+    companyCountry: "Bangladesh",
+    companyWebsite: "",
+    companyNotes: "",
     subscriptionPlan: "basic",
     subscriptionStatus: "active",
     subscriptionMonths: 1,
@@ -34,6 +43,9 @@ const AdminTenants = () => {
 
   const resetForm = () => setForm({
     tenantName: "", ownerName: "", ownerEmail: "", ownerPassword: "",
+    ownerPhone: "", ownerWhatsapp: "",
+    companyPhone: "", companyWhatsapp: "", companyAddress: "", companyCity: "",
+    companyCountry: "Bangladesh", companyWebsite: "", companyNotes: "",
     subscriptionPlan: "basic", subscriptionStatus: "active", subscriptionMonths: 1,
   });
 
@@ -106,57 +118,110 @@ const AdminTenants = () => {
               <DialogTrigger asChild>
                 <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Create Tenant</Button>
               </DialogTrigger>
-              <DialogContent className="max-w-lg">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Create New Tenant</DialogTitle>
                   <DialogDescription>Manually create a company and its owner account with a subscription.</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-2">
-                  <div className="grid gap-2">
-                    <Label>Company Name</Label>
-                    <Input value={form.tenantName} onChange={(e) => setForm({ ...form, tenantName: e.target.value })} placeholder="Al-Safa Travel Agency" />
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Company</h3>
+                    <div className="grid gap-2">
+                      <Label>Company Name *</Label>
+                      <Input value={form.tenantName} onChange={(e) => setForm({ ...form, tenantName: e.target.value })} placeholder="Al-Safa Travel Agency" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="grid gap-2">
+                        <Label>Company Phone</Label>
+                        <Input value={form.companyPhone} onChange={(e) => setForm({ ...form, companyPhone: e.target.value })} placeholder="+8801XXXXXXXXX" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Company WhatsApp</Label>
+                        <Input value={form.companyWhatsapp} onChange={(e) => setForm({ ...form, companyWhatsapp: e.target.value })} placeholder="+8801XXXXXXXXX" />
+                      </div>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Address</Label>
+                      <Input value={form.companyAddress} onChange={(e) => setForm({ ...form, companyAddress: e.target.value })} placeholder="Street, area" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="grid gap-2">
+                        <Label>City</Label>
+                        <Input value={form.companyCity} onChange={(e) => setForm({ ...form, companyCity: e.target.value })} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Country</Label>
+                        <Input value={form.companyCountry} onChange={(e) => setForm({ ...form, companyCountry: e.target.value })} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Website</Label>
+                        <Input value={form.companyWebsite} onChange={(e) => setForm({ ...form, companyWebsite: e.target.value })} placeholder="example.com" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="grid gap-2">
-                      <Label>Owner Name</Label>
-                      <Input value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} />
+
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Owner Account</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="grid gap-2">
+                        <Label>Owner Name *</Label>
+                        <Input value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Owner Email *</Label>
+                        <Input type="email" value={form.ownerEmail} onChange={(e) => setForm({ ...form, ownerEmail: e.target.value })} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="grid gap-2">
+                        <Label>Owner Mobile</Label>
+                        <Input value={form.ownerPhone} onChange={(e) => setForm({ ...form, ownerPhone: e.target.value })} placeholder="+8801XXXXXXXXX" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Owner WhatsApp</Label>
+                        <Input value={form.ownerWhatsapp} onChange={(e) => setForm({ ...form, ownerWhatsapp: e.target.value })} placeholder="+8801XXXXXXXXX" />
+                      </div>
                     </div>
                     <div className="grid gap-2">
-                      <Label>Owner Email</Label>
-                      <Input type="email" value={form.ownerEmail} onChange={(e) => setForm({ ...form, ownerEmail: e.target.value })} />
+                      <Label>Temporary Password *</Label>
+                      <Input type="text" value={form.ownerPassword} onChange={(e) => setForm({ ...form, ownerPassword: e.target.value })} placeholder="Min 6 characters" />
                     </div>
                   </div>
-                  <div className="grid gap-2">
-                    <Label>Temporary Password</Label>
-                    <Input type="text" value={form.ownerPassword} onChange={(e) => setForm({ ...form, ownerPassword: e.target.value })} placeholder="Min 6 characters" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="grid gap-2">
-                      <Label>Plan</Label>
-                      <Select value={form.subscriptionPlan} onValueChange={(v) => setForm({ ...form, subscriptionPlan: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="basic">Basic</SelectItem>
-                          <SelectItem value="pro">Pro</SelectItem>
-                          <SelectItem value="business">Business</SelectItem>
-                          <SelectItem value="enterprise">Unlimited</SelectItem>
-                        </SelectContent>
-                      </Select>
+
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Subscription</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="grid gap-2">
+                        <Label>Plan</Label>
+                        <Select value={form.subscriptionPlan} onValueChange={(v) => setForm({ ...form, subscriptionPlan: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="basic">Basic</SelectItem>
+                            <SelectItem value="pro">Pro</SelectItem>
+                            <SelectItem value="business">Business</SelectItem>
+                            <SelectItem value="enterprise">Unlimited</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Status</Label>
+                        <Select value={form.subscriptionStatus} onValueChange={(v) => setForm({ ...form, subscriptionStatus: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="trial">Trial</SelectItem>
+                            <SelectItem value="suspended">Suspended</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Months</Label>
+                        <Input type="number" min={1} value={form.subscriptionMonths} onChange={(e) => setForm({ ...form, subscriptionMonths: Number(e.target.value) })} />
+                      </div>
                     </div>
                     <div className="grid gap-2">
-                      <Label>Status</Label>
-                      <Select value={form.subscriptionStatus} onValueChange={(v) => setForm({ ...form, subscriptionStatus: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="trial">Trial</SelectItem>
-                          <SelectItem value="suspended">Suspended</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Months</Label>
-                      <Input type="number" min={1} value={form.subscriptionMonths} onChange={(e) => setForm({ ...form, subscriptionMonths: Number(e.target.value) })} />
+                      <Label>Notes (internal)</Label>
+                      <Input value={form.companyNotes} onChange={(e) => setForm({ ...form, companyNotes: e.target.value })} placeholder="Optional internal notes" />
                     </div>
                   </div>
                 </div>

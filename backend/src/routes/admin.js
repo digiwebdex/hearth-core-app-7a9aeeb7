@@ -10,6 +10,8 @@ router.post("/tenants", async (req, res) => {
   try {
     const {
       tenantName, ownerName, ownerEmail, ownerPassword,
+      ownerPhone, ownerWhatsapp,
+      companyPhone, companyWhatsapp, companyAddress, companyCity, companyCountry, companyWebsite, companyNotes,
       subscriptionPlan = "basic",
       subscriptionStatus = "active",
       subscriptionMonths = 1,
@@ -35,6 +37,13 @@ router.post("/tenants", async (req, res) => {
     const tenant = await prisma.tenant.create({
       data: {
         name: tenantName, slug,
+        phone: companyPhone || null,
+        whatsapp: companyWhatsapp || null,
+        address: companyAddress || null,
+        city: companyCity || null,
+        country: companyCountry || null,
+        website: companyWebsite || null,
+        notes: companyNotes || null,
         subscriptionPlan, subscriptionStatus,
         subscriptionExpiry: expiry,
       },
@@ -42,7 +51,11 @@ router.post("/tenants", async (req, res) => {
 
     const hashed = await bcrypt.hash(ownerPassword, 10);
     const user = await prisma.user.create({
-      data: { name: ownerName, email: ownerEmail, password: hashed, role: "tenant_owner", tenantId: tenant.id },
+      data: {
+        name: ownerName, email: ownerEmail, password: hashed, role: "tenant_owner",
+        phone: ownerPhone || null, whatsapp: ownerWhatsapp || null,
+        tenantId: tenant.id,
+      },
     });
     await prisma.tenant.update({ where: { id: tenant.id }, data: { ownerId: user.id } });
 
