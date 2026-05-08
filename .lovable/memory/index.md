@@ -8,3 +8,4 @@ lovable-tagger removed. No Lovable/Supabase references in codebase.
 
 ## Memories
 - [Architecture](mem://features/architecture) — Full-stack self-hosted setup, multi-tenant with JWT auth
+- [Portal & subdomains](mem://features/portal-and-subdomains) — Reserved subdomains app/portal/api, portal magic-link auth with separate JWT audience
