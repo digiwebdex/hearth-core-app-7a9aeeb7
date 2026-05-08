@@ -23,6 +23,11 @@ const AdminTenants = () => {
   const { toast } = useToast();
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [editTenant, setEditTenant] = useState<AdminTenant | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", subscriptionPlan: "basic", subscriptionStatus: "active", subscriptionExpiry: "", phone: "", whatsapp: "", address: "", city: "", country: "", website: "", notes: "" });
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AdminTenant | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState({
     tenantName: "",
     ownerName: "",
