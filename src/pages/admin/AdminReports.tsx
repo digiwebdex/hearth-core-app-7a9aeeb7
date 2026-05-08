@@ -115,7 +115,7 @@ const AdminReports = () => {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
           <Card><CardContent className="pt-6"><div className="flex items-center gap-3"><DollarSign className="h-8 w-8 text-green-600" /><div><p className="text-2xl font-bold">৳{stats.latestMrr.toLocaleString()}</p><p className="text-xs text-muted-foreground">MRR</p><p className="text-[10px] text-green-600 flex items-center gap-0.5"><TrendingUp className="h-3 w-3" />{stats.mrrGrowth}%</p></div></div></CardContent></Card>
           <Card><CardContent className="pt-6"><div className="flex items-center gap-3"><BarChart3 className="h-8 w-8 text-primary" /><div><p className="text-2xl font-bold">৳{(stats.latestMrr * 12).toLocaleString()}</p><p className="text-xs text-muted-foreground">ARR</p></div></div></CardContent></Card>
-          <Card><CardContent className="pt-6"><div className="flex items-center gap-3"><Building2 className="h-8 w-8 text-blue-500" /><div><p className="text-2xl font-bold">{stats.totalTenants}</p><p className="text-xs text-muted-foreground">Total Tenants</p></div></div></CardContent></Card>
+          <Card><CardContent className="pt-6"><div className="flex items-center gap-3"><Building2 className="h-8 w-8 text-blue-500" /><div><p className="text-2xl font-bold">{stats.totalTenants}</p><p className="text-xs text-muted-foreground">Total Agencies</p></div></div></CardContent></Card>
           <Card><CardContent className="pt-6"><div className="flex items-center gap-3"><Crown className="h-8 w-8 text-purple-500" /><div><p className="text-2xl font-bold">{stats.activeSubs}</p><p className="text-xs text-muted-foreground">Active Subs</p></div></div></CardContent></Card>
           <Card><CardContent className="pt-6"><div className="flex items-center gap-3"><Users className="h-8 w-8 text-indigo-500" /><div><p className="text-2xl font-bold">{stats.totalUsers}</p><p className="text-xs text-muted-foreground">Total Users</p></div></div></CardContent></Card>
           <Card><CardContent className="pt-6"><div className="flex items-center gap-3"><TrendingDown className="h-8 w-8 text-red-500" /><div><p className="text-2xl font-bold">{stats.churnRate}%</p><p className="text-xs text-muted-foreground">Churn Rate</p></div></div></CardContent></Card>
@@ -125,7 +125,7 @@ const AdminReports = () => {
         <Tabs defaultValue="revenue" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="revenue">Revenue</TabsTrigger>
-            <TabsTrigger value="growth">Tenant Growth</TabsTrigger>
+            <TabsTrigger value="growth">Agency Growth</TabsTrigger>
             <TabsTrigger value="plans">Plan Analytics</TabsTrigger>
             <TabsTrigger value="overdue">Overdue & Churn</TabsTrigger>
           </TabsList>
@@ -170,7 +170,7 @@ const AdminReports = () => {
               <CardContent>
                 <Table>
                   <TableHeader><TableRow>
-                    <TableHead>Plan</TableHead><TableHead className="text-right">Tenants</TableHead><TableHead className="text-right">Monthly Revenue</TableHead><TableHead className="text-right">% of MRR</TableHead>
+                    <TableHead>Plan</TableHead><TableHead className="text-right">Agencies</TableHead><TableHead className="text-right">Monthly Revenue</TableHead><TableHead className="text-right">% of MRR</TableHead>
                   </TableRow></TableHeader>
                   <TableBody>
                     {revenueByPlan.map((r) => (
@@ -192,7 +192,7 @@ const AdminReports = () => {
             <div className="flex justify-end"><Button variant="outline" size="sm" onClick={() => handleExport("tenants")}><Download className="mr-1 h-4 w-4" /> Export</Button></div>
             <div className="grid gap-4 lg:grid-cols-2">
               <Card>
-                <CardHeader><CardTitle className="text-base">Tenant Growth</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-base">Agency Growth</CardTitle></CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={280}>
                     <LineChart data={tenantGrowth}>
@@ -208,10 +208,10 @@ const AdminReports = () => {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader><CardTitle className="text-base">Top Tenants</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-base">Top Agencies</CardTitle></CardHeader>
                 <CardContent>
                   <Table>
-                    <TableHeader><TableRow><TableHead>Tenant</TableHead><TableHead>Plan</TableHead><TableHead className="text-right">Users</TableHead><TableHead className="text-right">Bookings</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead>Agency</TableHead><TableHead>Plan</TableHead><TableHead className="text-right">Users</TableHead><TableHead className="text-right">Bookings</TableHead></TableRow></TableHeader>
                     <TableBody>
                       {topTenants.map((t) => (
                         <TableRow key={t.name}>
@@ -255,7 +255,7 @@ const AdminReports = () => {
                         <div key={p.name} className="space-y-1.5">
                           <div className="flex items-center justify-between text-sm">
                             <span className="font-medium">{p.name}</span>
-                            <span className="text-muted-foreground">{p.value} tenants ({pct}%)</span>
+                            <span className="text-muted-foreground">{p.value} agencies ({pct}%)</span>
                           </div>
                           <div className="h-2 rounded-full bg-muted overflow-hidden">
                             <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: p.color }} />
@@ -279,7 +279,7 @@ const AdminReports = () => {
                 </CardHeader>
                 <CardContent>
                   <Table>
-                    <TableHeader><TableRow><TableHead>Tenant</TableHead><TableHead>Plan</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Days Late</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead>Agency</TableHead><TableHead>Plan</TableHead><TableHead className="text-right">Amount</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Days Late</TableHead></TableRow></TableHeader>
                     <TableBody>
                       {overduePayments.map((p, i) => (
                         <TableRow key={i}>
