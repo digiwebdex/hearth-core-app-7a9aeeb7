@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 
 const adminItems = [
   { title: "Overview", url: "/admin", icon: LayoutDashboard },
-  { title: "Tenants", url: "/admin/tenants", icon: Building2 },
+  { title: "Agencies", url: "/admin/tenants", icon: Building2 },
   { title: "Domains", url: "/admin/domains", icon: Globe },
   { title: "Payment Requests", url: "/admin/payments", icon: CreditCard },
   { title: "Manage Plans", url: "/admin/plans", icon: Crown },

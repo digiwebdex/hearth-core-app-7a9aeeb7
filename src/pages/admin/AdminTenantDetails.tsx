@@ -52,9 +52,9 @@ const AdminTenantDetails = () => {
       <AdminLayout>
         <div className="space-y-4">
           <Button variant="ghost" onClick={() => navigate("/admin/tenants")}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Tenants
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Agencies
           </Button>
-          <p className="text-muted-foreground text-center py-12">Tenant not found.</p>
+          <p className="text-muted-foreground text-center py-12">Agency not found.</p>
         </div>
       </AdminLayout>
     );
@@ -64,7 +64,7 @@ const AdminTenantDetails = () => {
     const next = tenant.status === "active" ? "suspended" : "active";
     setTenant({ ...tenant, status: next });
     toast({
-      title: next === "suspended" ? "Tenant Suspended" : "Tenant Activated",
+      title: next === "suspended" ? "Agency Suspended" : "Agency Activated",
       description: tenant.name,
       variant: next === "suspended" ? "destructive" : "default",
     });
@@ -93,7 +93,7 @@ const AdminTenantDetails = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold tracking-tight">{tenant.name}</h1>
-            <p className="text-sm text-muted-foreground">Tenant ID: {tenant.id}</p>
+            <p className="text-sm text-muted-foreground">Agency ID: {tenant.id}</p>
           </div>
           <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium capitalize ${statusColor}`}>
             {tenant.status}
@@ -246,11 +246,11 @@ const AdminTenantDetails = () => {
             <div className="flex flex-wrap gap-3">
               {tenant.status === "active" ? (
                 <Button variant="destructive" onClick={toggleStatus}>
-                  <Ban className="mr-2 h-4 w-4" /> Suspend Tenant
+                  <Ban className="mr-2 h-4 w-4" /> Suspend Agency
                 </Button>
               ) : (
                 <Button onClick={toggleStatus}>
-                  <CheckCircle className="mr-2 h-4 w-4" /> Activate Tenant
+                  <CheckCircle className="mr-2 h-4 w-4" /> Activate Agency
                 </Button>
               )}
               <Button variant="outline" onClick={() => { setNewPlan(tenant.plan); setChangePlanOpen(true); }}>
@@ -282,7 +282,7 @@ const AdminTenantDetails = () => {
             </div>
             {newPlan !== tenant.plan && (
               <div className="rounded-md border p-3 mt-2">
-                <p className="text-xs text-muted-foreground mb-1">This will immediately update the tenant's feature access.</p>
+                <p className="text-xs text-muted-foreground mb-1">This will immediately update the agency's feature access.</p>
                 {PLANS.find((p) => p.id === newPlan) && (
                   <div className="flex flex-wrap gap-1">
                     {PLANS.find((p) => p.id === newPlan)!.features.slice(0, 4).map((f) => (

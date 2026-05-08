@@ -73,7 +73,7 @@ const AdminDashboard = () => {
 
   const statCards = [
     { title: "Total Revenue", value: stats ? `৳${stats.totalRevenue.toLocaleString()}` : "—", icon: DollarSign },
-    { title: "Total Tenants", value: stats?.totalTenants ?? tenants.length, icon: Building2 },
+    { title: "Total Agencies", value: stats?.totalTenants ?? tenants.length, icon: Building2 },
     { title: "Active Subscriptions", value: statusDistribution.active, icon: Crown },
     { title: "Pending Payments", value: pendingPayments, icon: CreditCard },
     { title: "Total Users", value: stats?.totalUsers ?? "—", icon: Users },
@@ -118,13 +118,13 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Plan Distribution</CardTitle>
-              <CardDescription>Tenants by subscription plan</CardDescription>
+              <CardDescription>Agencies by subscription plan</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
                 <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-8 w-full" />)}</div>
               ) : planDistribution.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-6">No tenants yet</p>
+                <p className="text-sm text-muted-foreground text-center py-6">No agencies yet</p>
               ) : (
                 <div className="space-y-3">
                   {planDistribution.map((p) => {
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Subscription Status</CardTitle>
-              <CardDescription>Active vs expired tenants</CardDescription>
+              <CardDescription>Active vs expired agencies</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -171,7 +171,7 @@ const AdminDashboard = () => {
                   <div className="pt-2 border-t">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Total</span>
-                      <span className="font-bold">{tenants.length} tenants</span>
+                      <span className="font-bold">{tenants.length} agencies</span>
                     </div>
                   </div>
                 </div>
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Recent Tenants</CardTitle>
+                <CardTitle>Recent Agencies</CardTitle>
                 <CardDescription>Latest registrations</CardDescription>
               </div>
               <Button variant="ghost" size="sm" onClick={() => navigate("/admin/tenants")}>View All</Button>
@@ -194,7 +194,7 @@ const AdminDashboard = () => {
               {loading ? (
                 <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-10 w-full" />)}</div>
               ) : recentTenants.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-6">No tenants yet</p>
+                <p className="text-sm text-muted-foreground text-center py-6">No agencies yet</p>
               ) : (
                 <div className="space-y-3">
                   {recentTenants.map((t) => (
