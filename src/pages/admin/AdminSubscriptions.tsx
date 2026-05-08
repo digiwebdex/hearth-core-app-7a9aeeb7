@@ -624,6 +624,59 @@ const AdminSubscriptions = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Edit subscription */}
+        <Dialog open={!!editSub} onOpenChange={(o) => !o && setEditSub(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle>Edit Subscription — {editSub?.tenantName}</DialogTitle></DialogHeader>
+            <div className="grid gap-4 py-2">
+              <div className="grid gap-2">
+                <Label>Plan</Label>
+                <Select value={editPlan} onValueChange={(v) => setEditPlan(v as PlanType)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {PLANS.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Status</Label>
+                <Select value={editStatus} onValueChange={(v) => setEditStatus(v as SubscriptionStatus)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {STATUS_META.map((s) => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Expiry Date</Label>
+                <Input type="date" value={editExpiry} onChange={(e) => setEditExpiry(e.target.value)} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditSub(null)} disabled={savingEdit}>Cancel</Button>
+              <Button onClick={saveEdit} disabled={savingEdit}>{savingEdit ? "Saving…" : "Save changes"}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete subscription */}
+        <AlertDialog open={!!deleteSub} onOpenChange={(o) => !o && setDeleteSub(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete subscription?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This permanently deletes <strong>{deleteSub?.tenantName}</strong> along with its users, bookings, clients, invoices, and all related data. This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                {deleting ? "Deleting…" : "Delete permanently"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );
