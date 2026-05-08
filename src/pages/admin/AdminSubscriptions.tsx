@@ -313,7 +313,7 @@ const AdminSubscriptions = () => {
               </TableHeader>
               <TableBody>
                 {filtered.length === 0 ? (
-                  <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">No subscriptions found.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">{loading ? "Loading subscriptions…" : "No subscriptions found."}</TableCell></TableRow>
                 ) : (
                   filtered.map((sub) => {
                     const meta = getStatusMeta(sub.status);
