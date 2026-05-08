@@ -111,6 +111,55 @@ const AdminTenants = () => {
     }
   };
 
+  const openEdit = (t: AdminTenant) => {
+    setEditTenant(t);
+    setEditForm({
+      name: t.name || "",
+      subscriptionPlan: t.subscriptionPlan || "basic",
+      subscriptionStatus: t.subscriptionStatus || "active",
+      subscriptionExpiry: (t as any).subscriptionExpiry ? new Date((t as any).subscriptionExpiry).toISOString().slice(0, 10) : "",
+      phone: (t as any).phone || "",
+      whatsapp: (t as any).whatsapp || "",
+      address: (t as any).address || "",
+      city: (t as any).city || "",
+      country: (t as any).country || "",
+      website: (t as any).website || "",
+      notes: (t as any).notes || "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editTenant) return;
+    setSavingEdit(true);
+    try {
+      const payload: any = { ...editForm };
+      if (!payload.subscriptionExpiry) delete payload.subscriptionExpiry;
+      await adminApi.updateTenant(editTenant.id, payload);
+      toast({ title: "Agency updated", description: editForm.name });
+      setEditTenant(null);
+      fetchTenants();
+    } catch (err: any) {
+      toast({ title: "Update failed", description: err.message, variant: "destructive" });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await adminApi.deleteTenant(deleteTarget.id);
+      toast({ title: "Agency deleted", description: deleteTarget.name, variant: "destructive" });
+      setDeleteTarget(null);
+      fetchTenants();
+    } catch (err: any) {
+      toast({ title: "Delete failed", description: err.message, variant: "destructive" });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
