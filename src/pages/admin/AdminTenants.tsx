@@ -57,12 +57,12 @@ const AdminTenants = () => {
     setCreating(true);
     try {
       await adminApi.createTenant({ ...form, subscriptionMonths: Number(form.subscriptionMonths) });
-      toast({ title: "Tenant created", description: form.tenantName });
+      toast({ title: "Agency created", description: form.tenantName });
       setCreateOpen(false);
       resetForm();
       fetchTenants();
     } catch (err: any) {
-      toast({ title: "Failed to create tenant", description: err.message, variant: "destructive" });
+      toast({ title: "Failed to create agency", description: err.message, variant: "destructive" });
     } finally {
       setCreating(false);
     }
@@ -74,7 +74,7 @@ const AdminTenants = () => {
       const data = await adminApi.getTenants();
       setTenants(data);
     } catch (err: any) {
-      toast({ title: "Failed to load tenants", description: err.message, variant: "destructive" });
+      toast({ title: "Failed to load agencies", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -110,17 +110,17 @@ const AdminTenants = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">All Tenants</h1>
+            <h1 className="text-3xl font-bold tracking-tight">All Agencies</h1>
             <p className="text-muted-foreground">View and manage all registered companies</p>
           </div>
           <div className="flex items-center gap-2">
             <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) resetForm(); }}>
               <DialogTrigger asChild>
-                <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Create Tenant</Button>
+                <Button size="sm"><Plus className="mr-2 h-4 w-4" /> Create Agency</Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Create New Tenant</DialogTitle>
+                  <DialogTitle>Create New Agency</DialogTitle>
                   <DialogDescription>Manually create a company and its owner account with a subscription.</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-2">
@@ -227,7 +227,7 @@ const AdminTenants = () => {
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={creating}>Cancel</Button>
-                  <Button onClick={handleCreate} disabled={creating}>{creating ? "Creating…" : "Create Tenant"}</Button>
+                  <Button onClick={handleCreate} disabled={creating}>{creating ? "Creating…" : "Create Agency"}</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -264,7 +264,7 @@ const AdminTenants = () => {
                 <TableBody>
                   {filtered.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No tenants found.</TableCell>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No agencies found.</TableCell>
                     </TableRow>
                   ) : (
                     filtered.map((t) => {
