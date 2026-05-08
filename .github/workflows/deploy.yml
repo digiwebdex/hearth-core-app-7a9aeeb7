@@ -22,6 +22,15 @@ jobs:
             cd /var/www/hearth-core-app
             git pull origin main
 
+            echo "═══ Ensuring build env ═══"
+            if [ ! -f .env.production ]; then
+              cat > .env.production << 'EOF'
+            VITE_API_URL=https://api.travelagencyweb.com/api
+            VITE_APP_DOMAIN=travelagencyweb.com
+            EOF
+              echo "✅ Created .env.production"
+            fi
+
             echo "═══ Building frontend ═══"
             npm install
             npm run build

@@ -26,7 +26,7 @@ echo "═══ Step 3: Build frontend ═══"
 npm install
 npm run build
 
-echo "═══ Step 3: Deploy backend ═══"
+echo "═══ Step 4: Deploy backend ═══"
 cd "$BACKEND_DIR"
 
 if [ ! -f .env ]; then
