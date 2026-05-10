@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Check, Crown, Zap, Rocket, Star, Gem, AlertTriangle, ArrowUpRight, RefreshCw } from "lucide-react";
+import { Check, Crown, Zap, Rocket, Star, Gem, AlertTriangle, ArrowUpRight, RefreshCw, Phone, Building2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { PLANS, type PlanType } from "@/lib/plans";
