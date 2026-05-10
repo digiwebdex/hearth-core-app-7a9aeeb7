@@ -212,6 +212,66 @@ const Subscription_Page = () => {
           })}
         </div>
 
+        {/* Payment Methods */}
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">পেমেন্ট মাধ্যম / Payment Methods</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Mobile Banking */}
+              <div className="rounded-lg border bg-card p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Phone className="h-5 w-5 text-orange-500" />
+                  <h3 className="font-semibold">মোবাইল ব্যাংকিং (Mobile Banking)</h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between rounded-md border bg-muted/30 p-3">
+                    <div>
+                      <p className="font-medium text-pink-600 dark:text-pink-400">bKash / Nagad (Personal)</p>
+                      <p className="text-xs text-muted-foreground">Send Money</p>
+                    </div>
+                    <p className="font-bold tracking-wide">01674533303</p>
+                  </div>
+                  <div className="flex items-center justify-between rounded-md border bg-muted/30 p-3">
+                    <div>
+                      <p className="font-medium text-purple-600 dark:text-purple-400">Rocket</p>
+                      <p className="text-xs text-muted-foreground">Send Money</p>
+                    </div>
+                    <p className="font-bold tracking-wide">016745333033</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bank Transfer */}
+              <div className="rounded-lg border bg-card p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Building2 className="h-5 w-5 text-orange-500" />
+                  <h3 className="font-semibold">ব্যাংক ট্রান্সফার (Bank Transfer)</h3>
+                </div>
+                <div className="space-y-2 text-sm">
+                  {[
+                    ["Account Name", "Md. Iqbal Hossain"],
+                    ["Account Type", "Savings Account"],
+                    ["A/C No.", "2706101077904"],
+                    ["Routing No.", "175260162"],
+                    ["Bank", "Pubali Bank Limited"],
+                    ["Branch", "Asad Avenue, Mohammadpur, Dhaka-1207"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex justify-between gap-3">
+                      <span className="text-muted-foreground">{label}</span>
+                      <span className="font-semibold text-right">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className="text-center text-sm text-muted-foreground mt-4">
+              পেমেন্ট করার পর অবশ্যই Transaction ID সহ আমাদের জানান
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Payment Requests */}
         <Card>
           <CardHeader>
