@@ -10,6 +10,23 @@ const { handlePaymentSuccess, auditPaymentEvent } = require("../services/payment
 router.use("/sslcommerz", require("./sslcommerz"));
 router.use("/bkash", require("./bkash"));
 
+// GET /api/payments — list all payments for current tenant
+router.get("/", authenticate, async (req, res) => {
+  try {
+    const payments = await prisma.payment.findMany({
+      where: { tenantId: req.tenantId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        invoice: { select: { id: true, invoiceNumber: true, clientId: true } },
+      },
+    });
+    res.json(payments);
+  } catch (e) {
+    console.error("GET /payments error", e);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // POST /api/payments/initiate — universal payment initiation
 router.post("/initiate", authenticate, async (req, res) => {
   try {
