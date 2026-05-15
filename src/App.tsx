@@ -110,6 +110,11 @@ const AppContent = () => (
               <Route path="/site/packages" element={<WebsiteProvider><SitePackages /></WebsiteProvider>} />
               <Route path="/site/contact" element={<WebsiteProvider><SiteContact /></WebsiteProvider>} />
               <Route path="/site/pricing" element={<SitePricing />} />
+              {/* Slug-based public website (e.g. /site/al-safa-travel-agency) */}
+              <Route path="/site/:slug" element={<SiteSlugWrapper page="home" />} />
+              <Route path="/site/:slug/about" element={<SiteSlugWrapper page="about" />} />
+              <Route path="/site/:slug/packages" element={<SiteSlugWrapper page="packages" />} />
+              <Route path="/site/:slug/contact" element={<SiteSlugWrapper page="contact" />} />
 
               {/* App routes (protected) */}
               <Route path="/dashboard" element={<P><Dashboard /></P>} />
