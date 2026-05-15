@@ -1,47 +1,87 @@
-## Subdomain Architecture + Minimal Customer/Supplier Portal
 
-Set up reserved subdomains and build a minimal portal with magic-link login.
+# Full Operation QA Plan — Atom-to-Atom Test
 
-### 1. Subdomain routing (`src/lib/domainResolver.ts`)
-- Add `RESERVED_SUBDOMAINS = ['app', 'portal', 'api', 'www', 'admin']`
-- Extend `DomainResolution.type` with `"portal"` and `"app"`
-- In `resolveHostname()`: if subdomain is `app` → main agency app; if `portal` → portal; reserved subdomains never treated as agency slug
+Goal: Systematically exercise every surface of the live app (https://app.travelagencyweb.com + portal + admin) against the VPS backend, log every issue, then fix in priority order.
 
-### 2. Routing (`src/App.tsx`)
-- Detect `portal.*` hostname → mount `<PortalApp />` (separate route tree)
-- Detect `app.*` hostname → existing agency/admin routes
-- Root domain → marketing site
+## Approach
 
-### 3. Portal frontend (new files)
-- `src/portal/PortalApp.tsx` — route tree
-- `src/portal/pages/PortalLogin.tsx` — email input → request magic link
-- `src/portal/pages/PortalVerify.tsx` — consumes `?token=...` → sets session
-- `src/portal/pages/MyBookings.tsx` — customer bookings list
-- `src/portal/pages/MyPurchaseOrders.tsx` — supplier POs list
-- `src/portal/PortalLayout.tsx` — minimal nav (Bookings / POs / Logout)
-- `src/lib/portalApi.ts` — calls to `/api/portal/*`
+I'll drive the live preview/production with the browser automation tool, hit each route, perform real CRUD actions where safe, and capture: console errors, failing network requests (4xx/5xx), broken UI, missing data, and permission leaks. Findings go into the task tracker with severity (P0 blocker → P3 polish). Then I fix in batches.
 
-### 4. Backend (Node/Express + Prisma)
-- `backend/src/routes/portal.js`:
-  - `POST /portal/auth/request-link` — issue signed token, email it
-  - `POST /portal/auth/verify` — exchange token for JWT (audience: `portal`)
-  - `GET /portal/bookings` — bookings where `client.email = user.email`
-  - `GET /portal/purchase-orders` — POs where `vendor.email = user.email`
-- `backend/src/middleware/portalAuth.js` — verify portal JWT
-- Reuse existing email service for magic link delivery
+## Test Matrix
 
-### 5. Infrastructure (docs only — no code change required immediately)
-- DNS: A records for `app`, `portal`, `api` → VPS IP
-- Nginx server blocks for each subdomain → same Vite build (frontend distinguishes by hostname); `api.*` → Node backend on port 4000
-- `.env.example`: add `VITE_APP_DOMAIN=travelagencyweb.com`
+### 1. Auth & Access Control
+- Login (super admin, agency owner, agent, portal client, portal vendor)
+- Register new tenant → onboarding flow
+- Forgot password → reset password
+- Role guards: agent hitting admin route, client hitting agency route
+- Token refresh / session persistence on reload
+- Logout clears state
 
-### Technical notes
-- Portal uses a **separate JWT audience** (`portal`) so portal tokens cannot access agency endpoints
-- Client/Vendor lookup is by email match — no separate `portal_users` table needed initially
-- Magic link token: signed JWT, 15-min expiry, single-use (track jti in memory or DB)
-- Portal session JWT: 7-day expiry, stored in localStorage under `portal_token`
+### 2. Super Admin (`/admin/*`)
+- Dashboard metrics load
+- Tenants: list, view details, suspend/activate, impersonate
+- Subscriptions: plan changes, trial extension, billing status
+- Plans & Features: create/edit plan, toggle feature flags
+- Domains: add custom domain, verification status
+- Payments: gateway config, transaction list
+- SMS templates & logs
+- Audit log filtering
+- Reports & global settings
 
-### Out of scope (future)
-- Online payment from portal
-- Document uploads from supplier
-- Multi-agency portal accounts (currently one email = one agency context, picked from latest booking)
+### 3. Agency App (`/dashboard` + tenant routes)
+- Dashboard widgets, date filters
+- Leads: create → assign → convert to quotation
+- Quotations: builder, PDF print, send to client, status changes
+- Bookings: create from quotation, payment schedule, status flow
+- Clients: CRUD, profile, ledger
+- Vendors: CRUD, payables, payment record
+- Invoices: generate, mark paid, receipt print
+- Accounts: receivables, payables, expenses, cash/bank, profitability, ledger
+- Hajj/Umrah module
+- Tasks, Team, Agents, Roles, Organization
+- Reports (sales, payment, vendor, staff, profitability, leads)
+- Website customizer + public site preview
+- Settings: SMTP, payment gateways, notifications, SMS
+
+### 4. Client/Vendor Portal (`portal.travelagencyweb.com`)
+- Portal login + email verify
+- My Bookings list & detail
+- My Purchase Orders (vendor)
+- Payment links (bKash, SSLCommerz callback)
+
+### 5. Public Marketing Site (`travelagencyweb.com`)
+- Home, Pricing, Features, FAQ, Contact, Demo, Privacy, Terms
+- Tenant subdomain sites (Site* pages) render correctly
+- Contact form submits to backend
+- Demo request flow
+
+### 6. Cross-cutting
+- Subdomain routing (app / portal / tenant slug)
+- Subscription gating (trial expired, plan limits)
+- Feature gates per plan
+- Notification bell (admin + tenant)
+- File uploads (logo, attachments) → backend `/uploads`
+- Email sending (SMTP) — trigger one and check
+- SMS sending — trigger one and check logs
+- Mobile responsive spot-check at 375px
+
+## Deliverable
+
+After the sweep:
+1. Categorized issue list (P0/P1/P2/P3) with route + repro + network/console evidence
+2. Recommendation: fix P0/P1 now in this loop, queue P2/P3 for follow-up
+3. After fixes: re-test the failing flows to confirm green
+
+## Notes / Caveats
+
+- I'll need a working super-admin login and at least one agency tenant login on the live system. If you want me to test against production data, please confirm — I'll only do read + safe-create actions (no deletes, no real payments) unless you say otherwise.
+- Portal & payment-callback testing needs a real client account; I'll skip destructive payment flows.
+- If browser automation is at capacity I'll fall back to direct API curl checks against `api.travelagencyweb.com`.
+
+## Before I start, I need from you
+
+1. **Test credentials** for: super admin, one agency owner, one portal client (email + password). Or create throwaway test accounts I can use.
+2. **Scope confirmation**: production (`app.travelagencyweb.com`) or the Lovable preview? Production is more accurate but I'll be extra careful with destructive actions.
+3. **Permission to create test data** (a fake lead, quotation, booking) — I'll clean up after, or leave them tagged "QA-TEST" for you to delete.
+
+Reply with the creds + answers and I'll start the sweep immediately.
