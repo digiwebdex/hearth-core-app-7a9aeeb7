@@ -82,6 +82,12 @@ const A = ({ children }: { children: React.ReactNode }) => (
   <AdminRoute>{children}</AdminRoute>
 );
 
+const SiteSlugWrapper = ({ page }: { page: "home" | "about" | "packages" | "contact" }) => {
+  const { slug } = useParams<{ slug: string }>();
+  const Page = page === "about" ? SiteAbout : page === "packages" ? SitePackages : page === "contact" ? SiteContact : SiteHome;
+  return <WebsiteProvider slug={slug}><Page /></WebsiteProvider>;
+};
+
 const AppContent = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
