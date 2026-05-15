@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, useInRouterContext } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useInRouterContext, useParams } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -82,6 +82,12 @@ const A = ({ children }: { children: React.ReactNode }) => (
   <AdminRoute>{children}</AdminRoute>
 );
 
+const SiteSlugWrapper = ({ page }: { page: "home" | "about" | "packages" | "contact" }) => {
+  const { slug } = useParams<{ slug: string }>();
+  const Page = page === "about" ? SiteAbout : page === "packages" ? SitePackages : page === "contact" ? SiteContact : SiteHome;
+  return <WebsiteProvider slug={slug}><Page /></WebsiteProvider>;
+};
+
 const AppContent = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -110,6 +116,11 @@ const AppContent = () => (
               <Route path="/site/packages" element={<WebsiteProvider><SitePackages /></WebsiteProvider>} />
               <Route path="/site/contact" element={<WebsiteProvider><SiteContact /></WebsiteProvider>} />
               <Route path="/site/pricing" element={<SitePricing />} />
+              {/* Slug-based public website (e.g. /site/al-safa-travel-agency) */}
+              <Route path="/site/:slug" element={<SiteSlugWrapper page="home" />} />
+              <Route path="/site/:slug/about" element={<SiteSlugWrapper page="about" />} />
+              <Route path="/site/:slug/packages" element={<SiteSlugWrapper page="packages" />} />
+              <Route path="/site/:slug/contact" element={<SiteSlugWrapper page="contact" />} />
 
               {/* App routes (protected) */}
               <Route path="/dashboard" element={<P><Dashboard /></P>} />
