@@ -13,7 +13,7 @@ interface AuthContextType {
   trialDaysLeft: number;
   loading: boolean;
   login: (email: string, password: string) => Promise<User>;
-  register: (data: { name: string; email: string; password: string; tenantName: string }) => Promise<User>;
+  register: (data: { name: string; email: string; password: string; tenantName: string }) => Promise<{ pendingApproval: boolean; message?: string; user?: User }>;
   logout: () => void;
   refreshTenant: () => Promise<void>;
 }
@@ -90,10 +90,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const register = useCallback(
     async (data: { name: string; email: string; password: string; tenantName: string }) => {
       const res = await authApi.register(data);
+      // New signups are pending admin approval — no token returned
+      if (res.pendingApproval || !res.token) {
+        return { pendingApproval: true, message: res.message };
+      }
+      // Legacy path (auto-approval) — should not happen, but kept defensive
       localStorage.setItem("token", res.token);
-      setUser(res.user);
+      if (res.user) setUser(res.user);
       fetchTenant();
-      return res.user;
+      return { pendingApproval: false, user: res.user };
     },
     []
   );

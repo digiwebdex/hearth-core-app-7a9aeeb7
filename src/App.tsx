@@ -45,6 +45,7 @@ import Onboarding from "./pages/Onboarding";
 import UserGuide from "./pages/UserGuide";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminTenants from "./pages/admin/AdminTenants";
+import AdminPendingUsers from "./pages/admin/AdminPendingUsers";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminPlans from "./pages/admin/AdminPlans";
 import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
@@ -157,6 +158,7 @@ const AppContent = () => (
               {/* Admin routes */}
               <Route path="/admin" element={<A><AdminDashboard /></A>} />
               <Route path="/admin/tenants" element={<A><AdminTenants /></A>} />
+              <Route path="/admin/pending-users" element={<A><AdminPendingUsers /></A>} />
               <Route path="/admin/tenants/:tenantId" element={<A><AdminTenantDetails /></A>} />
               <Route path="/admin/payments" element={<A><AdminPayments /></A>} />
               <Route path="/admin/plans" element={<A><AdminPlans /></A>} />
