@@ -1,11 +1,13 @@
+# Memory: index.md
+Updated: just now
+
 # Project Memory
 
 ## Core
 Self-hosted VPS (Hostinger). No Lovable Cloud/Supabase. Backend = Node.js + Express + Prisma + PostgreSQL.
 Multi-tenant SaaS. Frontend = React + Vite + Tailwind. API at VITE_API_URL env var.
-Zero external platform dependency. All deploy via GitHub Actions → VPS SSH.
-lovable-tagger removed. No Lovable/Supabase references in codebase.
+VPS srv1468666 has /opt/scripts/healthcheck.sh monitoring 14 sites every 5 min with Telegram alerts.
 
 ## Memories
 - [Architecture](mem://features/architecture) — Full-stack self-hosted setup, multi-tenant with JWT auth
-- [Portal & subdomains](mem://features/portal-and-subdomains) — Reserved subdomains app/portal/api, portal magic-link auth with separate JWT audience
+- [VPS Monitoring](mem://features/vps-monitoring) — Healthcheck + PM2 auto-restart + Telegram alerts setup on srv1468666
