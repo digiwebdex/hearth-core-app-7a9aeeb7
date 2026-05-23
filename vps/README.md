@@ -1,56 +1,41 @@
 # 🏗️ VPS Architecture Pack
 
-**Goal:** Migrate all VPS projects from chaotic `/var/www/*` (PM2 + scattered configs) to clean **`/opt/projects/<name>/`** dockerized isolation.
+Goal: move projects from scattered `/var/www/*` + PM2 into isolated `/opt/projects/<name>/` folders with Docker, per-project database, persistent uploads, backups, rollback, and repeatable deploys.
 
-## 📐 Folder Layout
+## Layout
 
-```
+```text
 vps/
-├── README.md                    ← এই file
-├── templates/                   ← Reusable template (copy → modify for each project)
+├── templates/
 │   ├── compose/
-│   │   ├── docker-compose.cat-a.yml    ← Full-stack (app + db + redis)
-│   │   ├── docker-compose.cat-b.yml    ← Static only (nginx)
+│   │   ├── docker-compose.cat-a.yml
+│   │   ├── docker-compose.cat-b.yml
 │   │   └── env.cat-a.example
 │   ├── nginx/
-│   │   ├── site-cat-a.conf             ← Reverse proxy + SSL
-│   │   └── site-cat-b.conf             ← Static proxy
+│   │   └── site-cat-a.conf
 │   ├── scripts/
-│   │   ├── backup.sh                   ← Daily DB + uploads backup
-│   │   ├── restore.sh                  ← Restore from backup
-│   │   ├── deploy.sh                   ← Atomic deploy with rollback
-│   │   ├── rollback.sh                 ← One-command rollback
-│   │   └── healthcheck.sh              ← Status check
+│   │   ├── backup.sh
+│   │   ├── deploy.sh
+│   │   ├── healthcheck.sh
+│   │   ├── restore.sh
+│   │   └── rollback.sh
 │   └── docs/
-│       ├── PORT_REGISTRY.md            ← Master port allocation table
-│       └── MIGRATION_GUIDE.md          ← Step-by-step per project
-│
-└── projects/                    ← Per-project actual configs (generated from template)
-    └── hearth-core/             ← PILOT
-        ├── docker-compose.yml
-        ├── .env.example
-        ├── nginx-site.conf
+│       ├── MIGRATION_GUIDE.md
+│       └── PORT_REGISTRY.md
+└── projects/
+    └── hearth-core/
         ├── README.md
-        └── scripts/
-            ├── migrate-from-old.sh     ← One-time: migrate from /var/www to /opt/projects
-            └── ...
+        └── scripts/migrate-from-old.sh
 ```
 
-## 🚀 Phase Roadmap
+## Pilot
 
-| Phase | Scope | Status |
-|-------|-------|--------|
-| 0 | Backups (snapshot + tar + DB dump + B2 offsite) | ✅ Done |
-| 1 | **hearth-core pilot** — template validate | 🟡 In Progress |
-| 2 | Remaining 12 Cat A projects | ⏳ Pending |
-| 3 | 8 Cat B static projects | ⏳ Pending |
-| 4 | Cat C cleanup | ⏳ Pending |
-| 5 | Archive `/var/www`, kill host PM2 | ⏳ Pending |
+`hearth-core` is the pilot project:
 
-## 🔢 Port Registry (Master)
+- frontend: `app.travelagencyweb.com`
+- API: `api.travelagencyweb.com`
+- app port: `4101`
+- DB port: `5401`
+- Redis port: `6401`
 
-See [`templates/docs/PORT_REGISTRY.md`](templates/docs/PORT_REGISTRY.md)
-
-## 📖 Per-Project Migration
-
-See [`templates/docs/MIGRATION_GUIDE.md`](templates/docs/MIGRATION_GUIDE.md)
+Run the exact VPS commands in [`templates/docs/MIGRATION_GUIDE.md`](templates/docs/MIGRATION_GUIDE.md).

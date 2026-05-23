@@ -1,12 +1,12 @@
 # ═══════════════════════════════════════════════════════════
-# Category A Template — Full-stack (App + Postgres + Redis)
-# Usage: Copy to /opt/projects/<name>/docker-compose.yml
-#        Then fill .env with project-specific values
+# Category A Template — Full-stack SaaS (API + Postgres + Redis)
+# Runtime folder: /opt/projects/<name>/
+# Frontend is served by host Nginx from ./frontend/dist
+# API runs in the app container and is proxied by host Nginx.
 # ═══════════════════════════════════════════════════════════
 name: ${PROJECT_NAME}
 
 services:
-  # ──────────────── App (Node.js + Express + Prisma) ────────────────
   app:
     build:
       context: ./app
@@ -14,6 +14,8 @@ services:
     image: ${PROJECT_NAME}-app:latest
     container_name: ${PROJECT_NAME}-app
     restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
@@ -24,15 +26,13 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET}
-      # Project-specific env (override via .env)
-      APP_DOMAIN: ${APP_DOMAIN}
       FRONTEND_URL: https://${APP_DOMAIN}
+      API_BASE_URL: https://${API_DOMAIN}/api
     ports:
-      - "127.0.0.1:${APP_PORT}:3000"   # Host-exposed only on localhost (nginx proxies)
+      - "127.0.0.1:${APP_PORT}:3000"
     volumes:
-      - ./data/uploads:/app/uploads     # Persistent uploads
-      - ./logs/app:/app/logs            # App logs
+      - ./data/uploads:/app/uploads
+      - ./logs/app:/app/logs
     networks:
       - internal
     healthcheck:
@@ -47,7 +47,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # ──────────────── PostgreSQL (per-project isolated) ────────────────
   db:
     image: postgres:16-alpine
     container_name: ${PROJECT_NAME}-db
@@ -58,7 +57,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "127.0.0.1:${DB_PORT}:5432"   # localhost only — for `pg_dump` backups
+      - "127.0.0.1:${DB_PORT}:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./logs/postgres:/var/log/postgresql
@@ -80,7 +79,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # ──────────────── Redis (cache + sessions) ────────────────
   redis:
     image: redis:7-alpine
     container_name: ${PROJECT_NAME}-redis

@@ -1,51 +1,46 @@
 # hearth-core — Pilot Project
 
-**Domain:** `app.travelagencyweb.com` (+ subdomains)
-**Category:** A (Full-stack)
+**Frontend:** `https://app.travelagencyweb.com`  
+**API:** `https://api.travelagencyweb.com/api`  
 **Ports:** app `4101`, db `5401`, redis `6401`
 
-## Quick Commands (run on VPS at `/opt/projects/hearth-core/`)
+## First migration
 
 ```bash
-# Status
+cd /var/www/hearth-core-app
+git pull origin main
+export OLD_DB_PASSWORD='REAL_OLD_POSTGRES_PASSWORD_HERE'
+bash vps/projects/hearth-core/scripts/migrate-from-old.sh
+```
+
+## Daily operations on VPS
+
+```bash
+cd /opt/projects/hearth-core
 bash scripts/healthcheck.sh
-
-# Deploy latest code
 bash scripts/deploy.sh
-
-# Manual backup
 bash scripts/backup.sh
-
-# Restore latest backup
+bash scripts/rollback.sh
 bash scripts/restore.sh all
 
-# Rollback last deploy
-bash scripts/rollback.sh
-
-# Logs
+docker compose ps
 docker compose logs -f app
-docker compose logs -f db
 ```
 
-## First-time Setup
+## Runtime layout
 
-Follow [`../../templates/docs/MIGRATION_GUIDE.md`](../../templates/docs/MIGRATION_GUIDE.md) — Category A section, end-to-end.
-
-## Files Generated (after migration completes)
-
-```
+```text
 /opt/projects/hearth-core/
-├── docker-compose.yml      (from template)
-├── .env                    (filled with real secrets, chmod 600)
-├── app/                    (backend code from /var/www/hearth-core-app/backend)
-├── frontend/dist/          (built React app)
-├── data/
-│   ├── postgres/           (persistent DB volume)
-│   ├── redis/              (cache)
-│   └── uploads/            (user files)
-├── backups/
-│   ├── db/                 (daily SQL dumps, 30d retention)
-│   └── uploads/            (weekly tarballs, 14d retention)
-├── logs/                   (app + postgres + nginx + backup logs)
-└── scripts/                (backup/restore/deploy/rollback/healthcheck)
+├── source/                 # git source repo used for future deploys
+├── app/                    # backend runtime copied from source/backend
+├── frontend/dist/          # built React app served by host Nginx
+├── data/postgres/          # persistent PostgreSQL data
+├── data/redis/             # persistent Redis data
+├── data/uploads/           # persistent uploads
+├── backups/db/             # DB dumps
+├── backups/uploads/        # uploads tarballs
+├── logs/
+├── scripts/
+├── docker-compose.yml
+└── .env                    # real secrets, chmod 600
 ```
