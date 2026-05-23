@@ -40,7 +40,7 @@ export const authApi = {
       body: JSON.stringify({ email, password }),
     }),
   register: (data: { name: string; email: string; password: string; tenantName: string }) =>
-    request<{ token: string; user: User }>("/auth/register", {
+    request<{ token?: string; user?: User; pendingApproval?: boolean; message?: string }>("/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     }),
