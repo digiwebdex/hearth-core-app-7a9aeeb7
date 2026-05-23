@@ -1,87 +1,132 @@
+# 🏗️ VPS Full Architecture — Coolify Migration Plan
 
-# Full Operation QA Plan — Atom-to-Atom Test
+আপনার uploaded spreadsheet অনুসারে **21 projects** + cleanup। Target: প্রতিটা project Coolify/Docker এ আলাদা DB + uploads + port + backup নিয়ে চলবে। কোনো Lovable/Supabase dependency থাকবে না।
 
-Goal: Systematically exercise every surface of the live app (https://app.travelagencyweb.com + portal + admin) against the VPS backend, log every issue, then fix in priority order.
+---
 
-## Approach
+## 🎯 Final Architecture
 
-I'll drive the live preview/production with the browser automation tool, hit each route, perform real CRUD actions where safe, and capture: console errors, failing network requests (4xx/5xx), broken UI, missing data, and permission leaks. Findings go into the task tracker with severity (P0 blocker → P3 polish). Then I fix in batches.
+```text
+/opt/
+├── coolify/                    ← Coolify itself (port 8000, manages everything)
+└── projects/                   ← per-project persistent data only
+    ├── hearth-core/
+    │   ├── uploads/            ← bind-mounted into container
+    │   ├── backups/db/         ← daily pg_dump
+    │   └── backups/uploads/    ← daily tar.gz
+    ├── alrawsha/
+    ├── lucky-cruise/
+    └── ... (one folder per project)
 
-## Test Matrix
+/var/www/                       ← OLD — archive then delete after cutover
+```
 
-### 1. Auth & Access Control
-- Login (super admin, agency owner, agent, portal client, portal vendor)
-- Register new tenant → onboarding flow
-- Forgot password → reset password
-- Role guards: agent hitting admin route, client hitting agency route
-- Token refresh / session persistence on reload
-- Logout clears state
+Host nginx **removed** (Coolify's Traefik handles 80/443)। Coolify provisions:
+- Per-project PostgreSQL container (isolated network)
+- Per-project app container (Node/static)
+- Per-project Traefik route → `app.domain.com` + `api.domain.com`
+- Auto SSL (Let's Encrypt)
+- Auto deploys from GitHub on push
+- Built-in backups (S3/local)
 
-### 2. Super Admin (`/admin/*`)
-- Dashboard metrics load
-- Tenants: list, view details, suspend/activate, impersonate
-- Subscriptions: plan changes, trial extension, billing status
-- Plans & Features: create/edit plan, toggle feature flags
-- Domains: add custom domain, verification status
-- Payments: gateway config, transaction list
-- SMS templates & logs
-- Audit log filtering
-- Reports & global settings
+---
 
-### 3. Agency App (`/dashboard` + tenant routes)
-- Dashboard widgets, date filters
-- Leads: create → assign → convert to quotation
-- Quotations: builder, PDF print, send to client, status changes
-- Bookings: create from quotation, payment schedule, status flow
-- Clients: CRUD, profile, ledger
-- Vendors: CRUD, payables, payment record
-- Invoices: generate, mark paid, receipt print
-- Accounts: receivables, payables, expenses, cash/bank, profitability, ledger
-- Hajj/Umrah module
-- Tasks, Team, Agents, Roles, Organization
-- Reports (sales, payment, vendor, staff, profitability, leads)
-- Website customizer + public site preview
-- Settings: SMTP, payment gateways, notifications, SMS
+## 📋 Phases
 
-### 4. Client/Vendor Portal (`portal.travelagencyweb.com`)
-- Portal login + email verify
-- My Bookings list & detail
-- My Purchase Orders (vendor)
-- Payment links (bKash, SSLCommerz callback)
+### **Phase 0 — Pre-flight (1 day)**
+- VPS-wide snapshot via Hostinger panel
+- Install Coolify (`curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash`)
+- Open ports 8000 (admin), 80, 443; close everything else
+- Backup all `/var/www/*` → `/srv/backup/pre-coolify-YYYYMMDD.tar.gz`
+- Backup all PM2 databases → `/srv/backup/db/pre-coolify-*.sql.gz`
+- Kill all legacy PM2 processes (after backup)
 
-### 5. Public Marketing Site (`travelagencyweb.com`)
-- Home, Pricing, Features, FAQ, Contact, Demo, Privacy, Terms
-- Tenant subdomain sites (Site* pages) render correctly
-- Contact form submits to backend
-- Demo request flow
+### **Phase 1 — Pilot: hearth-core (Day 2)**
+This is your main SaaS, highest risk → migrate first to validate flow.
 
-### 6. Cross-cutting
-- Subdomain routing (app / portal / tenant slug)
-- Subscription gating (trial expired, plan limits)
-- Feature gates per plan
-- Notification bell (admin + tenant)
-- File uploads (logo, attachments) → backend `/uploads`
-- Email sending (SMTP) — trigger one and check
-- SMS sending — trigger one and check logs
-- Mobile responsive spot-check at 375px
+1. Rename old folder `hearth-core-app` → archive
+2. In Coolify GUI: New Project → "hearth-core"
+3. Add resources:
+   - PostgreSQL 16 (auto-generated password)
+   - Application: GitHub repo `digiwebdex/hearth-core-app`, branch `main`
+   - Build: `npm install && npm run build` (frontend) + `cd backend && npm ci && npx prisma migrate deploy`
+   - Start: `cd backend && node src/index.js`
+   - Persistent storage: `/app/backend/uploads` → `/opt/projects/hearth-core/uploads`
+4. Environment variables (Coolify UI):
+   - `DATABASE_URL` (auto-injected by Coolify DB resource)
+   - `JWT_SECRET`, `VITE_API_URL=https://api.travelagencyweb.com`
+5. Domains:
+   - `app.travelagencyweb.com` → frontend service
+   - `api.travelagencyweb.com` → backend service (port 3001 internal)
+6. Restore old DB into Coolify Postgres:
+   ```bash
+   gunzip < /srv/backup/db/hearth-pre-coolify.sql.gz | \
+     docker exec -i <coolify-pg-container> psql -U postgres -d hearth
+   ```
+7. Copy uploads: `rsync -av /var/www/hearth-core-app/backend/uploads/ /opt/projects/hearth-core/uploads/`
+8. Trigger deploy → SSL auto-issued → smoke test
+9. Setup nightly backup schedule in Coolify
 
-## Deliverable
+### **Phase 2 — Active full-stack projects (Day 3-5)**
+Apply same Coolify recipe to:
+- `alrawsha` (alrawshaintl.com)
+- `lucky-cruise` (luckytoursandtravels.com) — finish half-migration first
+- All others marked "Existing API – migrate"
 
-After the sweep:
-1. Categorized issue list (P0/P1/P2/P3) with route + repro + network/console evidence
-2. Recommendation: fix P0/P1 now in this loop, queue P2/P3 for follow-up
-3. After fixes: re-test the failing flows to confirm green
+### **Phase 3 — Static / frontend-only sites (Day 6)**
+For `ecotrippers`, `manasik-travel`, `darul-furkan`, etc.:
+- Coolify "Static Site" resource type
+- Build command: `npm run build` → publish `dist/`
+- No DB, no uploads volume unless needed
+- Domain → auto SSL
 
-## Notes / Caveats
+### **Phase 4 — Special: darul-furkan Supabase export (Day 7)**
+1. Export Supabase DB: `pg_dump` via Supabase dashboard
+2. Export Supabase Storage bucket via API → tar
+3. Import into fresh Coolify PostgreSQL + `/opt/projects/darul-furkan/uploads/`
+4. Update app `.env` to point at VPS DB
+5. Deploy via Coolify
+6. Verify, then disconnect Supabase project
 
-- I'll need a working super-admin login and at least one agency tenant login on the live system. If you want me to test against production data, please confirm — I'll only do read + safe-create actions (no deletes, no real payments) unless you say otherwise.
-- Portal & payment-callback testing needs a real client account; I'll skip destructive payment flows.
-- If browser automation is at capacity I'll fall back to direct API curl checks against `api.travelagencyweb.com`.
+### **Phase 5 — Investigate / Archive (Day 8)**
+- `primeskyint`: find domain or kill PM2 + archive
+- `digiwebdex` (old): confirm tilessaas replacement, then archive
+- `kurigram`, `masudtravels` (orphans): DNS check → archive
+- Move archived folders → `/srv/archive/YYYY-MM-DD/<name>.tar.gz` → delete from `/var/www`
 
-## Before I start, I need from you
+### **Phase 6 — Hardening (Day 9)**
+- UFW: allow 22, 80, 443, 8000 (Coolify admin behind VPN ideally)
+- Fail2ban for SSH + Coolify
+- Off-server backup: `rclone` to Hostinger Object Storage or Backblaze B2 nightly
+- Test full restore on a separate test VPS
 
-1. **Test credentials** for: super admin, one agency owner, one portal client (email + password). Or create throwaway test accounts I can use.
-2. **Scope confirmation**: production (`app.travelagencyweb.com`) or the Lovable preview? Production is more accurate but I'll be extra careful with destructive actions.
-3. **Permission to create test data** (a fake lead, quotation, booking) — I'll clean up after, or leave them tagged "QA-TEST" for you to delete.
+---
 
-Reply with the creds + answers and I'll start the sweep immediately.
+## 🔧 What I'll Generate For You
+
+I'll produce in this repo `vps/` directory:
+
+1. **`vps/install/01-pre-flight.sh`** — snapshot, backup all, kill PM2
+2. **`vps/install/02-install-coolify.sh`** — Coolify install + firewall
+3. **`vps/projects/<name>/coolify.json`** — import-ready Coolify config per project
+4. **`vps/projects/<name>/migrate.sh`** — DB restore + uploads rsync per project
+5. **`vps/backup/nightly.sh`** — off-server rclone backup
+6. **`vps/docs/RUNBOOK-bn.md`** — Bengali step-by-step copy-paste commands for every phase
+7. **`vps/docs/ROLLBACK.md`** — emergency rollback if Coolify cutover fails
+
+---
+
+## ⚠️ Critical Decisions Needed From You
+
+1. **Coolify vs raw docker-compose?** Spreadsheet says "Coolify/Docker". Coolify = GUI + auto SSL + auto deploy. Raw compose = more manual but lighter. **I recommend Coolify** since your spreadsheet specifies it. Confirm?
+2. **Old `/var/www` projects:** delete after backup or keep 30 days as `.tar.gz`?
+3. **Off-server backup destination:** Hostinger Object Storage, Backblaze B2, or AWS S3?
+4. **Downtime window:** can each project tolerate ~10 min DNS/SSL cutover, or need blue-green?
+
+---
+
+## ✅ Deliverables Order
+
+After you confirm the 4 questions above, I'll commit Phase 0 + Phase 1 scripts first (so you can run pilot tonight), then Phase 2–6 in subsequent batches as each phase completes successfully on the VPS.
+
+**Next action:** Approve plan → answer 4 questions → I write Phase 0 + 1 scripts → you run them on VPS → report output → proceed to Phase 2.
