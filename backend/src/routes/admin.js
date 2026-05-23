@@ -53,6 +53,9 @@ router.post("/tenants", async (req, res) => {
     const user = await prisma.user.create({
       data: {
         name: ownerName, email: ownerEmail, password: hashed, role: "tenant_owner",
+        status: "active",
+        approvedAt: new Date(),
+        approvedBy: req.userId,
         phone: ownerPhone || null, whatsapp: ownerWhatsapp || null,
         tenantId: tenant.id,
       },
@@ -284,6 +287,105 @@ router.patch("/payment-requests/:id", async (req, res) => {
     }).catch(() => {});
 
     res.json(pr);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+
+// ── Pending Users (signup approval queue) ──
+router.get("/pending-users", async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      where: { status: "pending" },
+      orderBy: { createdAt: "desc" },
+      include: { tenant: { select: { id: true, name: true, slug: true } } },
+    });
+    res.json(users.map(({ password, resetToken, resetTokenExpiry, ...u }) => u));
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+router.get("/users/status/:status", async (req, res) => {
+  try {
+    const { status } = req.params;
+    const users = await prisma.user.findMany({
+      where: { status },
+      orderBy: { createdAt: "desc" },
+      include: { tenant: { select: { id: true, name: true, slug: true } } },
+    });
+    res.json(users.map(({ password, resetToken, resetTokenExpiry, ...u }) => u));
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+router.post("/users/:id/approve", async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.status === "active") return res.status(400).json({ message: "User is already active" });
+
+    // Start the 14-day Pro trial from approval moment
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 14);
+
+    const updated = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        status: "active",
+        approvedAt: new Date(),
+        approvedBy: req.userId,
+        rejectionReason: null,
+      },
+    });
+    await prisma.tenant.update({
+      where: { id: user.tenantId },
+      data: { subscriptionStatus: "trial", subscriptionExpiry: trialEnd },
+    }).catch(() => {});
+
+    const actor = await prisma.user.findUnique({ where: { id: req.userId }, select: { name: true, email: true, role: true } });
+    const tenant = await prisma.tenant.findUnique({ where: { id: user.tenantId }, select: { name: true } });
+    await prisma.auditLog.create({
+      data: {
+        actorId: req.userId, actorName: actor?.name || "", actorEmail: actor?.email || "", actorRole: actor?.role || "",
+        tenantId: user.tenantId, tenantName: tenant?.name || null,
+        module: "admin", action: "user_approved",
+        targetType: "user", targetId: user.id, targetLabel: user.email,
+      },
+    }).catch(() => {});
+
+    try {
+      const { notifyUserApproved } = require("../services/telegramService");
+      notifyUserApproved({ name: user.name, email: user.email }).catch(() => {});
+    } catch (e) { /* ignore */ }
+
+    res.json({ id: updated.id, status: updated.status, approvedAt: updated.approvedAt });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+router.post("/users/:id/reject", async (req, res) => {
+  try {
+    const { reason } = req.body || {};
+    const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const updated = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        status: "rejected",
+        rejectionReason: reason || null,
+      },
+    });
+
+    const actor = await prisma.user.findUnique({ where: { id: req.userId }, select: { name: true, email: true, role: true } });
+    const tenant = await prisma.tenant.findUnique({ where: { id: user.tenantId }, select: { name: true } });
+    await prisma.auditLog.create({
+      data: {
+        actorId: req.userId, actorName: actor?.name || "", actorEmail: actor?.email || "", actorRole: actor?.role || "",
+        tenantId: user.tenantId, tenantName: tenant?.name || null,
+        module: "admin", action: "user_rejected",
+        targetType: "user", targetId: user.id, targetLabel: user.email,
+        newValue: reason || null,
+      },
+    }).catch(() => {});
+
+    res.json({ id: updated.id, status: updated.status, rejectionReason: updated.rejectionReason });
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 

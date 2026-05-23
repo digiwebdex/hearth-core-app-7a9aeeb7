@@ -12,6 +12,23 @@ router.post("/login", async (req, res) => {
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ message: "Invalid credentials" });
+
+    // Approval gate
+    if (user.status === "pending") {
+      return res.status(403).json({
+        message: "Your account is pending admin approval. You will be notified once approved.",
+        code: "PENDING_APPROVAL",
+      });
+    }
+    if (user.status === "rejected") {
+      return res.status(403).json({
+        message: user.rejectionReason
+          ? `Account rejected: ${user.rejectionReason}`
+          : "Your account has been rejected. Please contact support.",
+        code: "REJECTED",
+      });
+    }
+
     const token = jwt.sign({ userId: user.id, tenantId: user.tenantId, role: user.role }, SECRET, { expiresIn: "7d" });
     const { password: _, resetToken: _r, resetTokenExpiry: _e, ...safeUser } = user;
 
@@ -33,7 +50,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Register (creates tenant + user with 14-day Pro trial)
+// Register — creates tenant + owner in PENDING state, notifies admin via Telegram
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, tenantName } = req.body;
@@ -41,7 +58,7 @@ router.post("/register", async (req, res) => {
     if (exists) return res.status(400).json({ message: "Email already registered" });
     const hashed = await bcrypt.hash(password, 10);
 
-    // 14-day Pro trial
+    // 14-day Pro trial (starts after approval, but we set expiry now for reference)
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 14);
 
@@ -58,12 +75,17 @@ router.post("/register", async (req, res) => {
         name: tenantName || name + "'s Agency",
         slug,
         subscriptionPlan: "pro",
-        subscriptionStatus: "trial",
+        subscriptionStatus: "pending_approval",
         subscriptionExpiry: trialEnd,
       },
     });
     const user = await prisma.user.create({
-      data: { name, email, password: hashed, role: "tenant_owner", tenantId: tenant.id },
+      data: {
+        name, email, password: hashed,
+        role: "tenant_owner",
+        status: "pending",
+        tenantId: tenant.id,
+      },
     });
     await prisma.tenant.update({ where: { id: tenant.id }, data: { ownerId: user.id } });
 
@@ -72,15 +94,22 @@ router.post("/register", async (req, res) => {
       data: {
         actorId: user.id, actorName: name, actorEmail: email, actorRole: "tenant_owner",
         tenantId: tenant.id, tenantName: tenant.name,
-        module: "auth", action: "created",
-        targetType: "tenant", targetId: tenant.id, targetLabel: tenant.name,
-        newValue: "pro (14-day trial)",
+        module: "auth", action: "signup_pending",
+        targetType: "user", targetId: user.id, targetLabel: email,
+        newValue: "pending admin approval",
       },
     }).catch(() => {});
 
-    const token = jwt.sign({ userId: user.id, tenantId: tenant.id, role: user.role }, SECRET, { expiresIn: "7d" });
-    const { password: _, ...safeUser } = user;
-    res.json({ token, user: safeUser });
+    // Telegram notification (fire-and-forget, won't block response)
+    try {
+      const { notifyNewSignup } = require("../services/telegramService");
+      notifyNewSignup({ name, email, tenantName: tenant.name, userId: user.id }).catch(() => {});
+    } catch (e) { /* ignore */ }
+
+    res.json({
+      pendingApproval: true,
+      message: "Your account has been created and is pending admin approval. You will be notified once approved.",
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -63,10 +63,10 @@ const Index = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const newUser = await register({ name: form.ownerName, email: form.email, password: form.password, tenantName: form.companyName });
-      toast({ title: "Registration Successful!", description: `Welcome — ${PLANS.find(p => p.id === selectedPlan)?.name} plan` });
+      await register({ name: form.ownerName, email: form.email, password: form.password, tenantName: form.companyName });
+      toast({ title: "Account Submitted", description: `Your ${PLANS.find(p => p.id === selectedPlan)?.name} plan signup is pending admin approval. You'll be notified once approved.` });
       setDialogOpen(false);
-      navigate(newUser.role === "owner" ? "/admin" : "/dashboard");
+      navigate("/login");
     } catch (err: any) {
       toast({ variant: "destructive", title: "Registration Failed", description: err.message });
     } finally { setLoading(false); }
