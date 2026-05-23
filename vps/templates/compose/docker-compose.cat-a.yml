@@ -1,0 +1,109 @@
+# ═══════════════════════════════════════════════════════════
+# Category A Template — Full-stack (App + Postgres + Redis)
+# Usage: Copy to /opt/projects/<name>/docker-compose.yml
+#        Then fill .env with project-specific values
+# ═══════════════════════════════════════════════════════════
+name: ${PROJECT_NAME}
+
+services:
+  # ──────────────── App (Node.js + Express + Prisma) ────────────────
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    image: ${PROJECT_NAME}-app:latest
+    container_name: ${PROJECT_NAME}-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      # Project-specific env (override via .env)
+      APP_DOMAIN: ${APP_DOMAIN}
+      FRONTEND_URL: https://${APP_DOMAIN}
+    ports:
+      - "127.0.0.1:${APP_PORT}:3000"   # Host-exposed only on localhost (nginx proxies)
+    volumes:
+      - ./data/uploads:/app/uploads     # Persistent uploads
+      - ./logs/app:/app/logs            # App logs
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ──────────────── PostgreSQL (per-project isolated) ────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: ${PROJECT_NAME}-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "127.0.0.1:${DB_PORT}:5432"   # localhost only — for `pg_dump` backups
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./logs/postgres:/var/log/postgresql
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c shared_buffers=128MB
+      -c max_connections=100
+      -c log_min_duration_statement=500
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ──────────────── Redis (cache + sessions) ────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ${PROJECT_NAME}-redis
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${REDIS_PORT}:6379"
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - internal
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+networks:
+  internal:
+    name: ${PROJECT_NAME}_internal
+    driver: bridge
