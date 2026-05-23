@@ -22,6 +22,7 @@ async function main() {
       name: "Super Admin",
       password: adminPass,
       role: "super_admin",
+      status: "active",
       tenantId: adminTenant.id,
       resetToken: null,
       resetTokenExpiry: null,
@@ -31,6 +32,7 @@ async function main() {
       email: "digiwebdex@gmail.com",
       password: adminPass,
       role: "super_admin",
+      status: "active",
       tenantId: adminTenant.id,
     },
   });
@@ -51,6 +53,7 @@ async function main() {
       name: "Demo User",
       password: demoPass,
       role: "tenant_owner",
+      status: "active",
       tenantId: demoTenant.id,
       resetToken: null,
       resetTokenExpiry: null,
@@ -60,6 +63,7 @@ async function main() {
       email: "user@demo.com",
       password: demoPass,
       role: "tenant_owner",
+      status: "active",
       tenantId: demoTenant.id,
     },
   });
