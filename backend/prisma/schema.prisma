@@ -72,10 +72,14 @@ model User {
   email            String    @unique
   password         String
   role             String    @default("sales_agent")
+  status           String    @default("pending")   // "pending" | "active" | "rejected"
   phone            String?
   whatsapp         String?
   resetToken       String?
   resetTokenExpiry DateTime?
+  approvedAt       DateTime?
+  approvedBy       String?
+  rejectionReason  String?
   tenantId         String
   tenant           Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   createdAt        DateTime  @default(now())
