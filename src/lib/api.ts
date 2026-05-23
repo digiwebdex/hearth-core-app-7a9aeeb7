@@ -979,7 +979,27 @@ export const adminApi = {
   getPaymentRequests: () => request<AdminPaymentRequest[]>("/admin/payment-requests"),
   updatePaymentRequest: (id: string, data: Partial<AdminPaymentRequest>) =>
     request<AdminPaymentRequest>(`/admin/payment-requests/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  getPendingUsers: () => request<PendingUser[]>("/admin/pending-users"),
+  approveUser: (id: string) =>
+    request<{ id: string; status: string; approvedAt: string }>(`/admin/users/${id}/approve`, { method: "POST" }),
+  rejectUser: (id: string, reason?: string) =>
+    request<{ id: string; status: string; rejectionReason: string | null }>(
+      `/admin/users/${id}/reject`, { method: "POST", body: JSON.stringify({ reason }) }
+    ),
 };
+
+export interface PendingUser {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  whatsapp?: string | null;
+  role: string;
+  status: string;
+  createdAt: string;
+  tenantId: string;
+  tenant?: { id: string; name: string; slug: string | null };
+}
 
 // ── Domain Management API ──
 export interface TenantDomainRecord {
