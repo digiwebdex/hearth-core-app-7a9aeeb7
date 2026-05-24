@@ -80,7 +80,6 @@ const Onboarding = () => {
       const booking = await bookingApi.create({
         type: bookingType,
         clientId: createdClientId,
-        agentId: "",
         amount: bookingAmount,
         cost: bookingCost,
         profit,
