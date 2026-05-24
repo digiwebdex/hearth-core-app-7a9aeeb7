@@ -1,4 +1,4 @@
-＃ Nixpacks config — deploy ONLY the backend (Node.js + Express + Prisma).
+# Nixpacks config — deploy ONLY the backend (Node.js + Express + Prisma).
 # The React frontend is NOT built here; it is hosted separately (Nginx static).
 
 providers = ["node"]
