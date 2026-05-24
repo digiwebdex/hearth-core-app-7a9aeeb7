@@ -1,0 +1,16 @@
+# Nixpacks config — deploy ONLY the backend (Node.js + Express + Prisma).
+# The React frontend is NOT built here; it is hosted separately (Nginx static).
+
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
+
+[phases.install]
+cmds = ["cd backend && npm install && npx prisma generate"]
+
+[phases.build]
+cmds = ["echo 'Skipping frontend build — backend-only deployment'"]
+
+[start]
+cmd = "cd backend && npx prisma migrate deploy && node src/index.js"
