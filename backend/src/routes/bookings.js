@@ -19,7 +19,15 @@ router.get("/:id", requirePermission("bookings", "view"), async (req, res) => {
 });
 router.post("/", requirePermission("bookings", "create"), checkPlanLimit("bookings"), async (req, res) => {
   try {
-    const booking = await prisma.booking.create({ data: { ...req.body, tenantId: req.tenantId } });
+    const data = { ...req.body, tenantId: req.tenantId };
+    if (!data.agentId) {
+      data.agentId = null;
+    } else {
+      const agent = await prisma.agent.findFirst({ where: { id: data.agentId, tenantId: req.tenantId }, select: { id: true } });
+      if (!agent) data.agentId = null;
+    }
+
+    const booking = await prisma.booking.create({ data });
     const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { name: true, email: true, role: true } });
     const tenant = await prisma.tenant.findUnique({ where: { id: req.tenantId }, select: { name: true } });
     await prisma.auditLog.create({
@@ -36,7 +44,17 @@ router.post("/", requirePermission("bookings", "create"), checkPlanLimit("bookin
 });
 router.patch("/:id", requirePermission("bookings", "edit"), async (req, res) => {
   try {
-    await prisma.booking.updateMany({ where: { id: req.params.id, tenantId: req.tenantId }, data: req.body });
+    const data = { ...req.body };
+    if ("agentId" in data) {
+      if (!data.agentId) {
+        data.agentId = null;
+      } else {
+        const agent = await prisma.agent.findFirst({ where: { id: data.agentId, tenantId: req.tenantId }, select: { id: true } });
+        if (!agent) data.agentId = null;
+      }
+    }
+
+    await prisma.booking.updateMany({ where: { id: req.params.id, tenantId: req.tenantId }, data });
     res.json(await prisma.booking.findFirst({ where: { id: req.params.id } }));
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
