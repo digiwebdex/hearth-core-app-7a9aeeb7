@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,44 +8,41 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import {
-  ArrowLeft, Building2, Mail, Globe, Calendar, Crown, Users, BookOpen,
-  DollarSign, Ban, CheckCircle, ArrowUpCircle, AlertTriangle,
+  ArrowLeft, Building2, Mail, Calendar, Crown, Users, BookOpen,
+  DollarSign, Ban, CheckCircle, ArrowUpCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { PLANS, type PlanType } from "@/lib/plans";
-
-interface TenantDetail {
-  id: string;
-  name: string;
-  ownerName: string;
-  ownerEmail: string;
-  domain: string;
-  plan: PlanType;
-  planExpiry: string;
-  status: "active" | "suspended";
-  createdAt: string;
-  stats: {
-    totalUsers: number;
-    totalClients: number;
-    totalBookings: number;
-    totalRevenue: number;
-  };
-}
-
-const mockTenants: Record<string, TenantDetail> = {
-  t1: { id: "t1", name: "Acme Travel", ownerName: "John Doe", ownerEmail: "john@acme.com", domain: "acme.travelsaas.com", plan: "pro", planExpiry: "2026-04-01", status: "active", createdAt: "2025-01-15", stats: { totalUsers: 8, totalClients: 245, totalBookings: 1280, totalRevenue: 3200000 } },
-  t2: { id: "t2", name: "Globe Tours", ownerName: "Jane Smith", ownerEmail: "jane@globe.com", domain: "globe.travelsaas.com", plan: "basic", planExpiry: "2026-03-15", status: "active", createdAt: "2025-02-20", stats: { totalUsers: 3, totalClients: 85, totalBookings: 340, totalRevenue: 890000 } },
-  t3: { id: "t3", name: "Star Holidays", ownerName: "Ali Khan", ownerEmail: "ali@star.com", domain: "", plan: "free", planExpiry: "", status: "suspended", createdAt: "2025-03-01", stats: { totalUsers: 1, totalClients: 12, totalBookings: 28, totalRevenue: 45000 } },
-};
+import { adminApi, type AdminTenant } from "@/lib/api";
 
 const AdminTenantDetails = () => {
   const { tenantId } = useParams<{ tenantId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [tenant, setTenant] = useState<TenantDetail | null>(mockTenants[tenantId || ""] || null);
+  const [tenant, setTenant] = useState<AdminTenant | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [changePlanOpen, setChangePlanOpen] = useState(false);
   const [newPlan, setNewPlan] = useState<PlanType>("basic");
+
+  useEffect(() => {
+    if (!tenantId) return;
+    setLoading(true);
+    setError(null);
+    adminApi.getTenant(tenantId)
+      .then((t) => setTenant(t))
+      .catch((err) => setError(err?.message || "Failed to load agency"))
+      .finally(() => setLoading(false));
+  }, [tenantId]);
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <p className="text-muted-foreground text-center py-12">Loading agency…</p>
+      </AdminLayout>
+    );
+  }
 
   if (!tenant) {
     return (
@@ -54,39 +51,60 @@ const AdminTenantDetails = () => {
           <Button variant="ghost" onClick={() => navigate("/admin/tenants")}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Agencies
           </Button>
-          <p className="text-muted-foreground text-center py-12">Agency not found.</p>
+          <p className="text-muted-foreground text-center py-12">
+            {error || "Agency not found."}
+          </p>
         </div>
       </AdminLayout>
     );
   }
 
-  const toggleStatus = () => {
-    const next = tenant.status === "active" ? "suspended" : "active";
-    setTenant({ ...tenant, status: next });
-    toast({
-      title: next === "suspended" ? "Agency Suspended" : "Agency Activated",
-      description: tenant.name,
-      variant: next === "suspended" ? "destructive" : "default",
-    });
+  const owner =
+    tenant.users?.find((u) => u.id === tenant.ownerId) ||
+    tenant.users?.find((u) => u.role === "tenant_owner") ||
+    tenant.users?.[0];
+
+  const status = (tenant.subscriptionStatus === "suspended" ? "suspended" : "active") as "active" | "suspended";
+  const plan = (tenant.subscriptionPlan || "free") as PlanType;
+  const currentPlanInfo = PLANS.find((p) => p.id === plan);
+
+  const toggleStatus = async () => {
+    const next = status === "active" ? "suspended" : "active";
+    try {
+      const updated = await adminApi.updateTenant(tenant.id, { subscriptionStatus: next });
+      setTenant({ ...tenant, ...updated });
+      toast({
+        title: next === "suspended" ? "Agency Suspended" : "Agency Activated",
+        description: tenant.name,
+        variant: next === "suspended" ? "destructive" : "default",
+      });
+    } catch (err: any) {
+      toast({ title: "Failed", description: err?.message || "Update failed", variant: "destructive" });
+    }
   };
 
-  const handleChangePlan = () => {
-    const planInfo = PLANS.find((p) => p.id === newPlan);
-    setTenant({ ...tenant, plan: newPlan });
-    setChangePlanOpen(false);
-    toast({ title: "Plan Changed", description: `${tenant.name} → ${planInfo?.name || newPlan}` });
+  const handleChangePlan = async () => {
+    try {
+      const updated = await adminApi.updateTenant(tenant.id, { subscriptionPlan: newPlan });
+      setTenant({ ...tenant, ...updated });
+      setChangePlanOpen(false);
+      const planInfo = PLANS.find((p) => p.id === newPlan);
+      toast({ title: "Plan Changed", description: `${tenant.name} → ${planInfo?.name || newPlan}` });
+    } catch (err: any) {
+      toast({ title: "Failed", description: err?.message || "Update failed", variant: "destructive" });
+    }
   };
 
-  const statusColor = tenant.status === "active"
+  const statusColor = status === "active"
     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
     : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
 
-  const currentPlanInfo = PLANS.find((p) => p.id === tenant.plan);
+  const counts = tenant._count || { users: tenant.users?.length || 0, bookings: 0 };
+  const clientsCount = (tenant._count as any)?.clients ?? 0;
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex items-center gap-4 flex-wrap">
           <Button variant="ghost" size="sm" onClick={() => navigate("/admin/tenants")}>
             <ArrowLeft className="mr-1 h-4 w-4" /> Back
@@ -96,13 +114,11 @@ const AdminTenantDetails = () => {
             <p className="text-sm text-muted-foreground">Agency ID: {tenant.id}</p>
           </div>
           <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium capitalize ${statusColor}`}>
-            {tenant.status}
+            {status}
           </span>
         </div>
 
-        {/* Info + Subscription */}
         <div className="grid gap-4 md:grid-cols-2">
-          {/* Company Info */}
           <Card>
             <CardHeader><CardTitle className="text-lg">Company Information</CardTitle></CardHeader>
             <CardContent className="space-y-4">
@@ -117,34 +133,26 @@ const AdminTenantDetails = () => {
                 <Users className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Owner</p>
-                  <p className="font-medium">{tenant.ownerName}</p>
+                  <p className="font-medium">{owner?.name || "—"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Email</p>
-                  <p className="font-medium">{tenant.ownerEmail}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Globe className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Domain</p>
-                  <p className="font-medium">{tenant.domain || "No custom domain"}</p>
+                  <p className="font-medium">{owner?.email || "—"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Created</p>
-                  <p className="font-medium">{tenant.createdAt}</p>
+                  <p className="font-medium">{new Date(tenant.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Subscription */}
           <Card>
             <CardHeader><CardTitle className="text-lg">Subscription</CardTitle></CardHeader>
             <CardContent className="space-y-4">
@@ -152,7 +160,7 @@ const AdminTenantDetails = () => {
                 <Crown className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-xs text-muted-foreground">Current Plan</p>
-                  <Badge variant="secondary" className="capitalize text-sm">{currentPlanInfo?.name || tenant.plan}</Badge>
+                  <Badge variant="secondary" className="capitalize text-sm">{currentPlanInfo?.name || plan}</Badge>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -168,83 +176,42 @@ const AdminTenantDetails = () => {
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Expiry Date</p>
-                  <p className="font-medium">{tenant.planExpiry || "No expiry (Free plan)"}</p>
+                  <p className="font-medium">
+                    {tenant.subscriptionExpiry ? new Date(tenant.subscriptionExpiry).toLocaleDateString() : "No expiry"}
+                  </p>
                 </div>
               </div>
-              {currentPlanInfo && (
-                <div className="pt-2">
-                  <p className="text-xs text-muted-foreground mb-2">Features</p>
-                  <div className="flex flex-wrap gap-1">
-                    {currentPlanInfo.features.slice(0, 6).map((f) => (
-                      <Badge key={f} variant="outline" className="text-xs">{f}</Badge>
-                    ))}
-                    {currentPlanInfo.features.length > 6 && (
-                      <Badge variant="outline" className="text-xs">+{currentPlanInfo.features.length - 6} more</Badge>
-                    )}
-                  </div>
-                </div>
-              )}
-              <Button className="w-full mt-2" variant="outline" onClick={() => { setNewPlan(tenant.plan); setChangePlanOpen(true); }}>
+              <Button className="w-full mt-2" variant="outline" onClick={() => { setNewPlan(plan); setChangePlanOpen(true); }}>
                 <ArrowUpCircle className="mr-2 h-4 w-4" /> Change Plan
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Statistics */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <Users className="h-8 w-8 text-primary" />
-                <div>
-                  <p className="text-2xl font-bold">{tenant.stats.totalUsers}</p>
-                  <p className="text-xs text-muted-foreground">Total Users</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <Users className="h-8 w-8 text-blue-500" />
-                <div>
-                  <p className="text-2xl font-bold">{tenant.stats.totalClients}</p>
-                  <p className="text-xs text-muted-foreground">Total Clients</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <BookOpen className="h-8 w-8 text-emerald-500" />
-                <div>
-                  <p className="text-2xl font-bold">{tenant.stats.totalBookings.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Total Bookings</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <DollarSign className="h-8 w-8 text-amber-500" />
-                <div>
-                  <p className="text-2xl font-bold">৳{tenant.stats.totalRevenue.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Total Revenue</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <Card><CardContent className="pt-6"><div className="flex items-center gap-3">
+            <Users className="h-8 w-8 text-primary" />
+            <div><p className="text-2xl font-bold">{counts.users}</p><p className="text-xs text-muted-foreground">Total Users</p></div>
+          </div></CardContent></Card>
+          <Card><CardContent className="pt-6"><div className="flex items-center gap-3">
+            <Users className="h-8 w-8 text-blue-500" />
+            <div><p className="text-2xl font-bold">{clientsCount}</p><p className="text-xs text-muted-foreground">Total Clients</p></div>
+          </div></CardContent></Card>
+          <Card><CardContent className="pt-6"><div className="flex items-center gap-3">
+            <BookOpen className="h-8 w-8 text-emerald-500" />
+            <div><p className="text-2xl font-bold">{counts.bookings}</p><p className="text-xs text-muted-foreground">Total Bookings</p></div>
+          </div></CardContent></Card>
+          <Card><CardContent className="pt-6"><div className="flex items-center gap-3">
+            <DollarSign className="h-8 w-8 text-amber-500" />
+            <div><p className="text-2xl font-bold">—</p><p className="text-xs text-muted-foreground">Total Revenue</p></div>
+          </div></CardContent></Card>
         </div>
 
-        {/* Actions */}
         <Card>
           <CardHeader><CardTitle className="text-lg">Actions</CardTitle></CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">
-              {tenant.status === "active" ? (
+              {status === "active" ? (
                 <Button variant="destructive" onClick={toggleStatus}>
                   <Ban className="mr-2 h-4 w-4" /> Suspend Agency
                 </Button>
@@ -253,19 +220,18 @@ const AdminTenantDetails = () => {
                   <CheckCircle className="mr-2 h-4 w-4" /> Activate Agency
                 </Button>
               )}
-              <Button variant="outline" onClick={() => { setNewPlan(tenant.plan); setChangePlanOpen(true); }}>
+              <Button variant="outline" onClick={() => { setNewPlan(plan); setChangePlanOpen(true); }}>
                 <Crown className="mr-2 h-4 w-4" /> Change Plan
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Change Plan Dialog */}
         <Dialog open={changePlanOpen} onOpenChange={setChangePlanOpen}>
           <DialogContent>
             <DialogHeader><DialogTitle>Change Plan — {tenant.name}</DialogTitle></DialogHeader>
             <p className="text-sm text-muted-foreground">
-              Current: <Badge variant="secondary" className="capitalize ml-1">{currentPlanInfo?.name}</Badge>
+              Current: <Badge variant="secondary" className="capitalize ml-1">{currentPlanInfo?.name || plan}</Badge>
             </p>
             <div className="space-y-2">
               <Label>New Plan</Label>
@@ -280,20 +246,8 @@ const AdminTenantDetails = () => {
                 </SelectContent>
               </Select>
             </div>
-            {newPlan !== tenant.plan && (
-              <div className="rounded-md border p-3 mt-2">
-                <p className="text-xs text-muted-foreground mb-1">This will immediately update the agency's feature access.</p>
-                {PLANS.find((p) => p.id === newPlan) && (
-                  <div className="flex flex-wrap gap-1">
-                    {PLANS.find((p) => p.id === newPlan)!.features.slice(0, 4).map((f) => (
-                      <Badge key={f} variant="outline" className="text-xs">{f}</Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
             <div className="flex gap-2 mt-4">
-              <Button className="flex-1" onClick={handleChangePlan} disabled={newPlan === tenant.plan}>
+              <Button className="flex-1" onClick={handleChangePlan} disabled={newPlan === plan}>
                 Confirm Change
               </Button>
               <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
