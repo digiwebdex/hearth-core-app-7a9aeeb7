@@ -28,13 +28,59 @@ const AdminTenantDetails = () => {
 
   useEffect(() => {
     if (!tenantId) return;
-    setLoading(true);
-    setError(null);
-    adminApi.getTenant(tenantId)
-      .then((t) => setTenant(t))
-      .catch((err) => setError(err?.message || "Failed to load agency"))
-      .finally(() => setLoading(false));
-  }, [tenantId]);
+
+    let cancelled = false;
+
+    const loadTenant = async () => {
+      setLoading(true);
+      setTenant(null);
+      setError(null);
+
+      try {
+        const directTenant = await adminApi.getTenant(tenantId);
+        if (!cancelled) setTenant(directTenant);
+        return;
+      } catch (directErr: any) {
+        try {
+          const tenants = await adminApi.getTenants();
+          const matchedTenant = tenants.find(
+            (candidate) =>
+              candidate.id === tenantId ||
+              candidate.ownerId === tenantId ||
+              candidate.slug === tenantId ||
+              candidate.users?.some((user) => user.id === tenantId)
+          );
+
+          if (!matchedTenant) {
+            if (!cancelled) setError(directErr?.message || "Failed to load agency");
+            return;
+          }
+
+          const resolvedTenant = await adminApi.getTenant(matchedTenant.id).catch(() => matchedTenant);
+
+          if (cancelled) return;
+
+          setTenant(resolvedTenant);
+
+          if (matchedTenant.id !== tenantId) {
+            navigate(`/admin/tenants/${matchedTenant.id}`, { replace: true });
+          }
+        } catch (fallbackErr: any) {
+          if (!cancelled) {
+            setError(directErr?.message || fallbackErr?.message || "Failed to load agency");
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    loadTenant();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tenantId, navigate]);
 
   if (loading) {
     return (
