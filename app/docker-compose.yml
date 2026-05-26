@@ -1,0 +1,103 @@
+# ═══════════════════════════════════════════════════════════════
+# TravelAgencyWeb — VPS Production Stack (Coolify / Docker)
+# Path on VPS: /srv/travelagencyweb/app/docker-compose.yml
+#
+# Public access:
+#   https://travelagencyweb.com        → travelagencyweb-frontend:80
+#   https://www.travelagencyweb.com    → travelagencyweb-frontend:80
+#   https://app.travelagencyweb.com    → travelagencyweb-frontend:80
+#   https://api.travelagencyweb.com    → travelagencyweb-api:3027
+#
+# Coolify (or Caddy/Traefik) terminates TLS and routes by hostname.
+# When running this compose file standalone (without Coolify proxy),
+# uncomment the "ports:" blocks under api & frontend for direct testing.
+# ═══════════════════════════════════════════════════════════════
+name: travelagencyweb
+
+services:
+  travelagencyweb-postgres:
+    image: postgres:16-alpine
+    container_name: travelagencyweb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-travelagencyweb_db}
+      POSTGRES_USER: ${POSTGRES_USER:-travelagencyweb_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - /srv/travelagencyweb/data/postgres:/var/lib/postgresql/data
+    networks:
+      - travelagencyweb-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # No "ports:" — DB is internal only. Use psql via `docker exec`.
+
+  travelagencyweb-api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: travelagencyweb-api
+    restart: unless-stopped
+    depends_on:
+      travelagencyweb-postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3027
+      DATABASE_URL: postgresql://${POSTGRES_USER:-travelagencyweb_user}:${POSTGRES_PASSWORD}@travelagencyweb-postgres:5432/${POSTGRES_DB:-travelagencyweb_db}?schema=public
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://travelagencyweb.com,https://www.travelagencyweb.com,https://app.travelagencyweb.com,https://portal.travelagencyweb.com}
+      UPLOAD_DIR: /app/uploads
+      LOG_DIR: /app/logs
+      PUBLIC_UPLOAD_URL: ${PUBLIC_UPLOAD_URL:-https://api.travelagencyweb.com/uploads}
+      FRONTEND_URL: ${FRONTEND_URL:-https://travelagencyweb.com}
+      API_BASE_URL: ${API_BASE_URL:-https://api.travelagencyweb.com/api}
+      PORTAL_URL: ${PORTAL_URL:-https://portal.travelagencyweb.com}
+      CRON_SECRET: ${CRON_SECRET:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@travelagencyweb.com}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Travel Agency Web}
+      ADMIN_NOTIFICATION_EMAIL: ${ADMIN_NOTIFICATION_EMAIL:-}
+    volumes:
+      - /srv/travelagencyweb/data/uploads:/app/uploads
+      - /srv/travelagencyweb/data/logs:/app/logs
+    networks:
+      - travelagencyweb-net
+    # ports:
+    #   - "127.0.0.1:3028:3027"   # uncomment for local testing only
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.travelagencyweb-api.rule=Host(`api.travelagencyweb.com`)"
+      - "traefik.http.routers.travelagencyweb-api.entrypoints=websecure"
+      - "traefik.http.routers.travelagencyweb-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.travelagencyweb-api.loadbalancer.server.port=3027"
+
+  travelagencyweb-frontend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://api.travelagencyweb.com}
+    container_name: travelagencyweb-frontend
+    restart: unless-stopped
+    networks:
+      - travelagencyweb-net
+    # ports:
+    #   - "127.0.0.1:8080:80"     # uncomment for local testing only
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.travelagencyweb-frontend.rule=Host(`travelagencyweb.com`) || Host(`www.travelagencyweb.com`) || Host(`app.travelagencyweb.com`)"
+      - "traefik.http.routers.travelagencyweb-frontend.entrypoints=websecure"
+      - "traefik.http.routers.travelagencyweb-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.travelagencyweb-frontend.loadbalancer.server.port=80"
+
+networks:
+  travelagencyweb-net:
+    name: travelagencyweb-net
+    driver: bridge
