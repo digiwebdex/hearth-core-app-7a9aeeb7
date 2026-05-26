@@ -2,9 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const { PrismaClient } = require("@prisma/client");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+const prismaHealth = new PrismaClient();
+
 
 // Middleware
 const normalizeOrigin = (value) => value?.trim().replace(/\/$/, "");
@@ -93,6 +96,23 @@ app.use("/api/email", require("./routes/email"));
 app.use("/api/cron", require("./routes/cron"));
 
 // Health check
-app.get("/api/health", (_, res) => res.json({ status: "ok", time: new Date().toISOString() }));
+app.get("/api/health", async (_req, res) => {
+  let dbStatus = "disconnected";
+  try {
+    await prismaHealth.$queryRaw`SELECT 1`;
+    dbStatus = "connected";
+  } catch (e) {
+    dbStatus = `error: ${e.code || e.message}`;
+  }
+  res.json({
+    status: dbStatus === "connected" ? "ok" : "degraded",
+    service: "travelagencyweb-api",
+    database: dbStatus,
+    environment: process.env.NODE_ENV || "development",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.listen(PORT, () => console.log(`✅ TAWSS API running on port ${PORT}`));
+
